@@ -1,4 +1,4 @@
-RPI Covid Dashboard Scrapper
+RPI Covid Dashboard Scraper
 ----------------------------
 
 Scrapes https://covid19.rpi.edu/dashboard and (optionally) posts to a discord channel using webhooks.
