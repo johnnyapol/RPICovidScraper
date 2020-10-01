@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Usage: ./main.py <DISCORD_WEBHOOK_URL>
+# Usage: ./main.py
 '''
 Copyright (C) 2020 John C. Allwein 'johnnyapol' (admin@johnnyapol.me)
 
@@ -10,11 +10,17 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '''
 import requests
-import discord_webhook
-from discord_webhook import DiscordEmbed
+from discord_webhook import DiscordEmbed, DiscordWebhook
 from bs4 import BeautifulSoup
 from random import choice
 import sys
+
+try:
+    import webhook_urls
+    webhooks = webhook_urls.webhooks
+except:
+    print("No discord webhooks supplied - data will just be stored locally")
+    webhooks = None
 
 
 def check_for_updates():
@@ -39,7 +45,7 @@ def check_for_updates():
     return case_data
 
 
-def post_discord(case_data):
+def post_discord(case_data, webhook):
     thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
@@ -66,8 +72,9 @@ def post_discord(case_data):
     embed.set_author(
         name="Click for RPI COVID Dashboard", url="https://covid19.rpi.edu/dashboard"
     )
+    embed.set_footer(text="Powered by https://github.com/johnnyapol/RPICovidScraper")
 
-    hook = discord_webhook.DiscordWebhook(url=sys.argv[1])
+    hook = DiscordWebhook(url=webhook)
     hook.add_embed(embed)
     hook.execute()
 
@@ -95,10 +102,11 @@ def main():
     current_case_data = check_for_updates()
 
     if current_case_data != previous_case_data:
-        if len(sys.argv) < 2:
-            print("Skipping posting to discord as argv[1] a/k/a webhook URL is missing")
+        if webhooks == None:
+            print("Skipping posting to discord as no webhooks supplied")
         else:
-            post_discord(current_case_data)
+            for webhook in webhooks:
+                post_discord(current_case_data, webhook)
         save(current_case_data)
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
