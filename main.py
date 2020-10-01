@@ -40,7 +40,7 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    case_data = [x.text for x in data]
+    case_data = [x.text.strip() for x in data]
 
     return case_data
 
