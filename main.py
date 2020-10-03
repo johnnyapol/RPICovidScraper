@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Usage: ./main.py
-'''
+"""
 Copyright (C) 2020 John C. Allwein 'johnnyapol' (admin@johnnyapol.me)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -8,7 +8,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-'''
+"""
 import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from bs4 import BeautifulSoup
@@ -17,6 +17,7 @@ import sys
 
 try:
     import webhook_urls
+
     webhooks = webhook_urls.webhooks
 except:
     print("No discord webhooks supplied - data will just be stored locally")
@@ -40,12 +41,10 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    case_data = [x.text.strip() for x in data]
-
-    return case_data
+    return [x.text.strip() for x in data]
 
 
-def post_discord(case_data, webhook):
+def post_discord(case_data, urls):
     thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
@@ -57,24 +56,33 @@ def post_discord(case_data, webhook):
         int(case_data[1].replace(",", "")) / int(case_data[3].replace(",", ""))
     ) * 100
 
-    embed = DiscordEmbed(description="RPI Covid Dashboard Updated", color=242424)
+    embed = DiscordEmbed(color=242424)
     embed.set_thumbnail(url=choice(thumbnails))
-    embed.add_embed_field(name="Positive Tests (last 24 hours)", value=case_data[0])
     embed.add_embed_field(
-        name="Positive Test Results (last 7 days)", value=case_data[1]
+        name="Positive Tests (24 hours)", value=case_data[0], inline=False
     )
-    embed.add_embed_field(name="Total Tests (last 7 days)", value=case_data[3])
+    embed.add_embed_field(name="Positive Tests (7 days)", value=case_data[1])
+    embed.add_embed_field(name="Total Tests (7 days)", value=case_data[3])
     embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
         name="Positive Test Results (since August 17th)", value=case_data[2]
     )
     embed.add_embed_field(name="Total Tests (since August 17th)", value=case_data[4])
     embed.set_author(
-        name="Click for RPI COVID Dashboard", url="https://covid19.rpi.edu/dashboard"
+        name="Click for dashboard",
+        url="https://covid19.rpi.edu/dashboard",
+        icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
-    embed.set_footer(text="Powered by https://github.com/johnnyapol/RPICovidScraper")
+    embed.set_footer(
+        text="Made with ❤️ - https://github.com/johnnyapol/RPICovidScraper"
+    )
 
-    hook = DiscordWebhook(url=webhook)
+    hook = DiscordWebhook(
+        url=urls,
+        content="The RPI Covid Dashboard has been updated!",
+        username="RPI Covid Dashboard",
+        avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
+    )
     hook.add_embed(embed)
     hook.execute()
 
@@ -105,8 +113,7 @@ def main():
         if webhooks == None:
             print("Skipping posting to discord as no webhooks supplied")
         else:
-            for webhook in webhooks:
-                post_discord(current_case_data, webhook)
+            post_discord(current_case_data, webhooks)
         save(current_case_data)
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
