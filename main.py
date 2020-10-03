@@ -116,6 +116,7 @@ def load_previous():
                 case_data.append(line.rstrip())
     except:
         print("Cache read failed")
+        case_data = ["0","0","0","0","0"]
     return case_data
 
 
