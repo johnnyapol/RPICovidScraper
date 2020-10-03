@@ -44,7 +44,15 @@ def check_for_updates():
     return [x.text.strip() for x in data]
 
 
-def post_discord(case_data, urls):
+def case_value_to_string(case_data, previous_case_data, index):
+    diff = int(case_data[index].replace(",", "")) - int(
+        previous_case_data[index].replace(",", "")
+    )
+    diff_string = f"({diff:+d})" if diff != 0 else ""
+    return f"{case_data[index]} {diff_string}"
+
+
+def post_discord(case_data, urls, previous_case_data):
     thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
@@ -59,15 +67,27 @@ def post_discord(case_data, urls):
     embed = DiscordEmbed(color=242424)
     embed.set_thumbnail(url=choice(thumbnails))
     embed.add_embed_field(
-        name="Positive Tests (24 hours)", value=case_data[0], inline=False
+        name="Positive Tests (24 hours)",
+        value=case_value_to_string(case_data, previous_case_data, 0),
+        inline=False,
     )
-    embed.add_embed_field(name="Positive Tests (7 days)", value=case_data[1])
-    embed.add_embed_field(name="Total Tests (7 days)", value=case_data[3])
+    embed.add_embed_field(
+        name="Positive Tests (7 days)",
+        value=case_value_to_string(case_data, previous_case_data, 1),
+    )
+    embed.add_embed_field(
+        name="Total Tests (7 days)",
+        value=case_value_to_string(case_data, previous_case_data, 3),
+    )
     embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
-        name="Positive Test Results (since August 17th)", value=case_data[2]
+        name="Positive Test Results (since August 17th)",
+        value=case_value_to_string(case_data, previous_case_data, 2),
     )
-    embed.add_embed_field(name="Total Tests (since August 17th)", value=case_data[4])
+    embed.add_embed_field(
+        name="Total Tests (since August 17th)",
+        value=case_value_to_string(case_data, previous_case_data, 4),
+    )
     embed.set_author(
         name="Click for dashboard",
         url="https://covid19.rpi.edu/dashboard",
@@ -113,7 +133,7 @@ def main():
         if webhooks == None:
             print("Skipping posting to discord as no webhooks supplied")
         else:
-            post_discord(current_case_data, webhooks)
+            post_discord(current_case_data, webhooks, previous_case_data)
         save(current_case_data)
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
