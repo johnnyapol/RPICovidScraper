@@ -1,0 +1,5 @@
+# webhook_urls.py
+# Rename this file to webhook_urls.py (it is .gitignored to avoid conflicts with running instances)
+# Update the `webhooks` list to your desired configuration
+
+webhooks = ['my_webhook_url_1', 'my_webhook_url_2', '....', 'my_webhook_url_N']
