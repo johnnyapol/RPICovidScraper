@@ -41,7 +41,7 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    return [x.text.strip() for x in data]
+    return [ ''.join(x.text.strip().split(' ')) for x in data]
 
 
 def case_value_to_string(case_data, previous_case_data, index):
