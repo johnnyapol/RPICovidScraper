@@ -94,7 +94,7 @@ def post_discord(case_data, urls, previous_case_data):
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
     embed.set_footer(
-        text="Made with ❤️ - https://github.com/johnnyapol/RPICovidScraper"
+        text="Made with 🥓 - https://github.com/johnnyapol/RPICovidScraper"
     )
 
     hook = DiscordWebhook(
