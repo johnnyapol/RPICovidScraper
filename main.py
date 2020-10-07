@@ -15,6 +15,8 @@ from bs4 import BeautifulSoup
 from random import choice
 import sys
 
+import pickle
+
 try:
     import webhook_urls
 
@@ -23,14 +25,15 @@ except:
     print("No discord webhooks supplied - data will just be stored locally")
     webhooks = None
 
+def sanitize(x : str) -> int:
+    return int(''.join((''.join(x.text.strip().split(' '))).split(",")))
+
 
 def check_for_updates():
     request = requests.get("https://covid19.rpi.edu/dashboard")
     soup = BeautifulSoup(request.text, features="lxml")
     header = "field field--name-field-stats field--type-entity-reference-revisions field--label-hidden field__items"
     header2 = "field field--name-field-stat field--type-string field--label-hidden field__item"
-    data = soup.find("div", {"class": header})
-    data = data.findAll("div", {"class": header2})
 
     """
         Current data format:
@@ -41,15 +44,13 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    return [ ''.join(x.text.strip().split(' ')) for x in data]
+    return [sanitize(x) for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})]
 
 
 def case_value_to_string(case_data, previous_case_data, index):
-    diff = int(case_data[index].replace(",", "")) - int(
-        previous_case_data[index].replace(",", "")
-    )
-    diff_string = f"({diff:+d})" if diff != 0 else ""
-    return f"{case_data[index]} {diff_string}"
+    diff = case_data[index] - previous_case_data[index]
+    diff_string = f"({diff:+,})" if diff != 0 else ""
+    return f"{case_data[index]:,} {diff_string}"
 
 
 def post_discord(case_data, urls, previous_case_data):
@@ -61,7 +62,7 @@ def post_discord(case_data, urls, previous_case_data):
     # Calculate weekly positivity rate
     # Need to strip commas out
     pcr = (
-        int(case_data[1].replace(",", "")) / int(case_data[3].replace(",", ""))
+        case_data[1] / case_data[3]
     ) * 100
 
     embed = DiscordEmbed(color=242424)
@@ -108,24 +109,17 @@ def post_discord(case_data, urls, previous_case_data):
 
 
 def load_previous():
-    case_data = []
     try:
-        with open(".cache", "r") as file:
-            lines = file.readlines()
-            for line in lines:
-                case_data.append(line.rstrip())
+        with open(".cache", "rb") as file:
+            return pickle.load(file)
     except:
         print("Cache read failed")
-        case_data = ["0","0","0","0","0"]
-    return case_data
-
+        return [0,0,0,0,0]
 
 def save(case_data):
-    with open(".cache", "w") as file:
-        for case in case_data:
-            file.write(case + "\n")
-
-
+    with open(".cache", "wb") as file:
+        pickle.dump(case_data, file)
+    
 def main():
     previous_case_data = load_previous()
     current_case_data = check_for_updates()
