@@ -25,8 +25,9 @@ except:
     print("No discord webhooks supplied - data will just be stored locally")
     webhooks = None
 
-def sanitize(x : str) -> int:
-    return int(''.join((''.join(x.text.strip().split(' '))).split(",")))
+
+def sanitize(x: str) -> int:
+    return int("".join(("".join(x.text.strip().split(" "))).split(",")))
 
 
 def check_for_updates():
@@ -44,7 +45,10 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    return [sanitize(x) for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})]
+    return [
+        sanitize(x)
+        for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})
+    ]
 
 
 def case_value_to_string(case_data, previous_case_data, index):
@@ -61,9 +65,7 @@ def post_discord(case_data, urls, previous_case_data):
 
     # Calculate weekly positivity rate
     # Need to strip commas out
-    pcr = (
-        case_data[1] / case_data[3]
-    ) * 100
+    pcr = (case_data[1] / case_data[3]) * 100
 
     embed = DiscordEmbed(color=242424)
     embed.set_thumbnail(url=choice(thumbnails))
@@ -114,12 +116,14 @@ def load_previous():
             return pickle.load(file)
     except:
         print("Cache read failed")
-        return [0,0,0,0,0]
+        return [0, 0, 0, 0, 0]
+
 
 def save(case_data):
     with open(".cache", "wb") as file:
         pickle.dump(case_data, file)
-    
+
+
 def main():
     previous_case_data = load_previous()
     current_case_data = check_for_updates()
