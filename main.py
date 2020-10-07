@@ -26,10 +26,6 @@ except:
     webhooks = None
 
 
-def sanitize(x: str) -> int:
-    return int("".join(("".join(x.text.strip().split(" "))).split(",")))
-
-
 def check_for_updates():
     request = requests.get("https://covid19.rpi.edu/dashboard")
     soup = BeautifulSoup(request.text, features="lxml")
@@ -46,7 +42,7 @@ def check_for_updates():
         case_data[4] = total tests (since august 17th)
     """
     return [
-        sanitize(x)
+        int("".join(("".join(x.text.strip().split(" "))).split(",")))
         for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})
     ]
 
@@ -64,7 +60,6 @@ def post_discord(case_data, urls, previous_case_data):
     ]
 
     # Calculate weekly positivity rate
-    # Need to strip commas out
     pcr = (case_data[1] / case_data[3]) * 100
 
     embed = DiscordEmbed(color=242424)
@@ -125,6 +120,7 @@ def save(case_data):
 
 
 def main():
+    global webhooks
     previous_case_data = load_previous()
     current_case_data = check_for_updates()
 
