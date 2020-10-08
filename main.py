@@ -58,6 +58,8 @@ def post_discord(case_data, urls, previous_case_data):
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
     ]
 
+    emojis = ["❤, ✨","🥓","🦄", "🌯","🍺"]
+
     # Calculate weekly positivity rate
     # Need to strip commas out
     pcr = (
@@ -93,18 +95,19 @@ def post_discord(case_data, urls, previous_case_data):
         url="https://covid19.rpi.edu/dashboard",
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
-    embed.set_footer(
-        text="Made with 🥓 - https://github.com/johnnyapol/RPICovidScraper"
-    )
+    for url in urls:
+        embed.set_footer(
+            text="Made with {} - https://github.com/johnnyapol/RPICovidScraper".format(choice(emojis))
+        )
 
-    hook = DiscordWebhook(
-        url=urls,
-        content="The RPI Covid Dashboard has been updated!",
-        username="RPI Covid Dashboard",
-        avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
-    )
-    hook.add_embed(embed)
-    hook.execute()
+        hook = DiscordWebhook(
+            url=[url],
+            content="The RPI Covid Dashboard has been updated!",
+            username="RPI Covid Dashboard",
+            avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
+        )
+        hook.add_embed(embed)
+        hook.execute()
 
 
 def load_previous():
