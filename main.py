@@ -79,11 +79,11 @@ def post_discord(case_data, urls, previous_case_data):
     )
     embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
-        name="Positive Test Results (since August 17th)",
+        name="Positive Test Results (since August 1st)",
         value=case_value_to_string(case_data, previous_case_data, 2),
     )
     embed.add_embed_field(
-        name="Total Tests (since August 17th)",
+        name="Total Tests (since August 1st)",
         value=case_value_to_string(case_data, previous_case_data, 4),
     )
     embed.set_author(
