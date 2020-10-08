@@ -58,7 +58,7 @@ def post_discord(case_data, urls, previous_case_data):
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
     ]
 
-    emojis = ["❤, ✨","🥓","🦄", "🌯","🍺"]
+    emojis = ["❤","✨","🥓","🦄", "🌯","🍺"]
 
     # Calculate weekly positivity rate
     # Need to strip commas out
