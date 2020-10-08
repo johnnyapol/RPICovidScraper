@@ -31,6 +31,7 @@ def check_for_updates():
     soup = BeautifulSoup(request.text, features="lxml")
     header = "field field--name-field-stats field--type-entity-reference-revisions field--label-hidden field__items"
     header2 = "field field--name-field-stat field--type-string field--label-hidden field__item"
+    date_header = "field field--name-field-stats-caption field--type-string field--label-hidden field__item"
 
     """
         Current data format:
@@ -41,10 +42,15 @@ def check_for_updates():
         case_data[3] = total tests (last 7 days)
         case_data[4] = total tests (since august 17th)
     """
-    return [
-        int("".join(("".join(x.text.strip().split(" "))).split(",")))
-        for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})
-    ]
+    return (
+        [
+            int("".join(("".join(x.text.strip().split(" "))).split(",")))
+            for x in soup.find("div", {"class": header}).findAll(
+                "div", {"class": header2}
+            )
+        ],
+        soup.find("div", {"class": date_header}).text,
+    )
 
 
 def case_value_to_string(case_data, previous_case_data, index):
@@ -53,7 +59,7 @@ def case_value_to_string(case_data, previous_case_data, index):
     return f"{case_data[index]:,} {diff_string}"
 
 
-def post_discord(case_data, urls, previous_case_data):
+def post_discord(case_data, previous_case_data, date, urls):
     thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
@@ -95,7 +101,7 @@ def post_discord(case_data, urls, previous_case_data):
     )
     for url in urls:
         embed.set_footer(
-            text=f"Made with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
+            text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
         )
 
         hook = DiscordWebhook(
@@ -125,13 +131,13 @@ def save(case_data):
 def main():
     global webhooks
     previous_case_data = load_previous()
-    current_case_data = check_for_updates()
+    current_case_data, date = check_for_updates()
 
     if current_case_data != previous_case_data:
         if webhooks == None:
             print("Skipping posting to discord as no webhooks supplied")
         else:
-            post_discord(current_case_data, webhooks, previous_case_data)
+            post_discord(current_case_data, previous_case_data, date, webhooks)
         save(current_case_data)
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
