@@ -59,7 +59,7 @@ def post_discord(case_data, urls, previous_case_data):
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
     ]
 
-    emojis = ["❤","✨","🥓","🦄", "🌯","🍺"]
+    emojis = ["❤", "✨", "🥓", "🦄", "🌯", "🍺"]
 
     # Calculate weekly positivity rate
     pcr = (case_data[1] / case_data[3]) * 100
@@ -95,7 +95,7 @@ def post_discord(case_data, urls, previous_case_data):
     )
     for url in urls:
         embed.set_footer(
-            text="Made with {} - https://github.com/johnnyapol/RPICovidScraper".format(choice(emojis))
+            text=f"Made with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
         )
 
         hook = DiscordWebhook(
