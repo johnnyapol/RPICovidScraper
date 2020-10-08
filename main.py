@@ -12,7 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import requests
 from discord_webhook import DiscordEmbed, DiscordWebhook
 from bs4 import BeautifulSoup
-from random import choice
+from random import choice, randint
 import sys
 
 import pickle
@@ -48,9 +48,10 @@ def check_for_updates():
 
 
 def case_value_to_string(case_data, previous_case_data, index):
-    diff = case_data[index] - previous_case_data[index]
+    diff = randint(-1, 200)
+    curr_case_data = previous_case_data[index] + diff
     diff_string = f"({diff:+,})" if diff != 0 else ""
-    return f"{case_data[index]:,} {diff_string}"
+    return f"{curr_case_data:,} {diff_string}"
 
 
 def post_discord(case_data, urls, previous_case_data):
