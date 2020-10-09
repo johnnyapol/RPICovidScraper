@@ -85,9 +85,10 @@ def post_discord(case_data, previous_case_data, date, urls):
         name="Total Tests (7 days)",
         value=case_value_to_string(case_data, previous_case_data, 3),
     )
-    embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
+    if case_data[1] != 0:
+        embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
-        name="Positive Test Results (since August 1st)",
+        name="Total Positive Tests (since August 1st)",
         value=case_value_to_string(case_data, previous_case_data, 2),
     )
     embed.add_embed_field(
