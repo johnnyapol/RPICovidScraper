@@ -9,14 +9,15 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import os
+import pickle
 import requests
-from discord_webhook import DiscordEmbed, DiscordWebhook
-from bs4 import BeautifulSoup
 from random import choice
 import sys
-import savepagenow
 
-import pickle
+from bs4 import BeautifulSoup
+from discord_webhook import DiscordEmbed, DiscordWebhook
+import savepagenow
 
 try:
     import webhook_urls
@@ -141,6 +142,11 @@ def main():
     current_case_data, date = check_for_updates()
 
     ci = any(x.lower() == "--ci" for x in sys.argv)
+
+    if ci:
+        # Use CI webhook
+        print("Detected CI run - using CI_WEBHOOK")
+        webhooks = os.environ["CI_WEBHOOK"].split(",")
 
     if current_case_data != previous_case_data:
         dashboard_url = DASHBOARD

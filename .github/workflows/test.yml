@@ -14,5 +14,7 @@ jobs:
         run: |
             pip install -r requirements.txt
       - name: Dry run
+        env:
+            CI_WEBHOOK: ${{ secrets.TEST_WEBHOOK }}
         run: |
-            python main.py
+            python main.py --ci
