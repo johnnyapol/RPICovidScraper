@@ -1,3 +1,4 @@
 discord_webhook
 bs4
 lxml
+savepagenow
