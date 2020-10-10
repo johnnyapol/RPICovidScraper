@@ -26,9 +26,11 @@ except:
     print("No discord webhooks supplied - data will just be stored locally")
     webhooks = None
 
+DASHBOARD = "https://covid19.rpi.edu/dashboard"
+
 
 def check_for_updates():
-    request = requests.get("https://covid19.rpi.edu/dashboard")
+    request = requests.get(DASHBOARD)
     soup = BeautifulSoup(request.text, features="lxml")
     header = "field field--name-field-stats field--type-entity-reference-revisions field--label-hidden field__items"
     header2 = "field field--name-field-stat field--type-string field--label-hidden field__item"
@@ -60,7 +62,10 @@ def case_value_to_string(case_data, previous_case_data, index):
     return f"{case_data[index]:,} {diff_string}"
 
 
-def post_discord(case_data, previous_case_data, date, urls):
+def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
+
+    if webhooks is None:
+        return print("Skipping posting to discord as no webhooks supplied")
     thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
@@ -98,7 +103,7 @@ def post_discord(case_data, previous_case_data, date, urls):
     )
     embed.set_author(
         name="Click for dashboard",
-        url="https://covid19.rpi.edu/dashboard",
+        url=dashboard_url,
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
     for url in urls:
@@ -135,13 +140,22 @@ def main():
     previous_case_data = load_previous()
     current_case_data, date = check_for_updates()
 
+    ci = any(x.lower() == "--ci" for x in sys.argv)
+
     if current_case_data != previous_case_data:
-        if webhooks == None:
-            print("Skipping posting to discord as no webhooks supplied")
-        else:
-            post_discord(current_case_data, previous_case_data, date, webhooks)
+        dashboard_url = DASHBOARD
+        try:
+            # We don't want to abuse the Wayback Machine in actions
+            if not ci:
+                dashboard_url = savepagenow.capture(DASHBOARD, accept_cache=True)
+            else:
+                print("Skipping page archive as we are running in CI mode")
+        except Exception as e:
+            print(f"Page archived failed {e}")
+        post_discord(
+            current_case_data, previous_case_data, date, dashboard_url, webhooks
+        )
         save(current_case_data)
-        savepagenow.capture("https://covid19.rpi.edu/dashboard")
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
 
