@@ -14,6 +14,7 @@ from discord_webhook import DiscordEmbed, DiscordWebhook
 from bs4 import BeautifulSoup
 from random import choice
 import sys
+import savepagenow
 
 import pickle
 
@@ -140,6 +141,7 @@ def main():
         else:
             post_discord(current_case_data, previous_case_data, date, webhooks)
         save(current_case_data)
+        savepagenow.capture('https://covid19.rpi.edu/dashboard')
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
 
