@@ -1,7 +1,7 @@
 RPI Covid Dashboard Scraper
 ----------------------------
 
-Scrapes https://covid19.rpi.edu/dashboard and (optionally) posts to discord channels using webhooks.
+Scrapes https://covid19.rpi.edu/dashboard and (optionally) posts to discord channels using webhooks. It also submits a request to the Wayback Machine / Internet Archive to perform a capture of the site when the data is updated.
 
 # Usage
 
