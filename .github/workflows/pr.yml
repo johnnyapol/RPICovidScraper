@@ -1,5 +1,5 @@
-name: Automated Regression Testing (push)
-on: [push]
+name: Automated Regression Testing (pr)
+on: [pull_request]
 jobs:
   test:
     name: Automated Regression Testing
@@ -14,7 +14,5 @@ jobs:
         run: |
             pip install -r requirements.txt
       - name: Dry run
-        env:
-            CI_WEBHOOK: ${{ secrets.TEST_WEBHOOK }}
         run: |
             python main.py --ci
