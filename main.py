@@ -72,7 +72,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
     ]
 
-    emojis = ["❤", "✨", "🥓", "🦄", "🌯", "🍺"]
+    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻"]
 
     # Calculate weekly positivity rate
     pcr = (case_data[1] / case_data[3]) * 100
