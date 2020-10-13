@@ -78,12 +78,12 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     pcr = (case_data[1] / case_data[3]) * 100
 
     embed = DiscordEmbed(color=242424)
-    
+
     if case_data[0] > 0:
         embed.set_thumbnail(url=thumbnails[0])
     else:
         embed.set_thumbnail(url=thumbnails[1])
-    
+
     embed.add_embed_field(
         name="Positive Tests (24 hours)",
         value=case_value_to_string(case_data, previous_case_data, 0),
