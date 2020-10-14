@@ -74,7 +74,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     negative_thumbnails = ["https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
                            "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg"]
 
-
+    closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
     emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻"]
 
@@ -83,10 +83,14 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     embed = DiscordEmbed(color=242424)
 
-    if case_data[0] > 0:
-        embed.set_thumbnail(url=choice(positive_thumbnails))
+    if case_data[2] < 100:
+        if case_data[0] > 0:
+            embed.set_thumbnail(url=choice(positive_thumbnails))
+        else:
+            embed.set_thumbnail(url=choice(negative_thumbnails))
     else:
-        embed.set_thumbnail(url=choice(negative_thumbnails))
+        embed.set_thumbnail(url=closed_thumbnail)
+
 
     embed.add_embed_field(
         name="Positive Tests (24 hours)",
