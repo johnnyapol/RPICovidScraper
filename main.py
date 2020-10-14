@@ -83,7 +83,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     embed = DiscordEmbed(color=242424)
 
-    if not case_data[0] > 0:
+    if case_data[0] > 0:
         embed.set_thumbnail(url=choice(positive_thumbnails))
     else:
         embed.set_thumbnail(url=choice(negative_thumbnails))
