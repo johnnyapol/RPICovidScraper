@@ -14,6 +14,7 @@ import pickle
 import requests
 from random import choice
 import sys
+import traceback
 
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordEmbed, DiscordWebhook
@@ -24,6 +25,7 @@ try:
 
     webhooks = webhook_urls.webhooks
 except:
+    traceback.print_exc()
     print("No discord webhooks supplied - data will just be stored locally")
     webhooks = None
 
@@ -31,6 +33,7 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 
 
 def check_for_updates():
+    global DASHBOARD
     request = requests.get(DASHBOARD)
     soup = BeautifulSoup(request.text, features="lxml")
     header = "field field--name-field-stats field--type-entity-reference-revisions field--label-hidden field__items"
