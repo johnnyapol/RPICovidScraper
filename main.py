@@ -25,8 +25,8 @@ try:
 
     webhooks = webhook_urls.webhooks
 except:
-    traceback.print_exc()
     print("No discord webhooks supplied - data will just be stored locally")
+    traceback.print_exc()
     webhooks = None
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
