@@ -80,17 +80,14 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻"]
-
-    # Calculate weekly positivity rate
-    pcr = (case_data[1] / case_data[3]) * 100
-
-    embed = DiscordEmbed(color=242424)
+    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀" ]
 
     if case_data[2] < 100:
         if case_data[0] > 0:
+            embed = DiscordEmbed(color=15158332)
             embed.set_thumbnail(url=choice(positive_thumbnails))
         else:
+            embed = DiscordEmbed(color=3066993)
             embed.set_thumbnail(url=choice(negative_thumbnails))
     else:
         embed.set_thumbnail(url=closed_thumbnail)
@@ -109,6 +106,8 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         value=case_value_to_string(case_data, previous_case_data, 3),
     )
     if case_data[1] != 0:
+        # Calculate weekly positivity rate
+        pcr = (case_data[1] / case_data[3]) * 100
         embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
         name="Total Positive Tests (since August 1st)",
