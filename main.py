@@ -80,7 +80,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀" ]
+    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀"]
 
     if case_data[2] < 100:
         if case_data[0] > 0:
