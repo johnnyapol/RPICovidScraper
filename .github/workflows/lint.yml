@@ -2,7 +2,7 @@ name: Lint
 on: [push, pull_request]
 jobs:
   lint:
-    name: Run linters
+    name: Lint via python-black
     runs-on: ubuntu-latest
 
     steps:

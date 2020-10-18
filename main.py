@@ -158,11 +158,6 @@ def main():
 
     ci = any(x.lower() == "--ci" for x in sys.argv)
 
-    if ci and "CI_WEBHOOK" in os.environ:
-        # Use CI webhook
-        print("Detected CI run - using CI_WEBHOOK")
-        webhooks = os.environ["CI_WEBHOOK"].split(",")
-
     if current_case_data != previous_case_data:
         dashboard_url = DASHBOARD
         try:
