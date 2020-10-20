@@ -13,6 +13,7 @@ import os
 import pickle
 import requests
 from random import choice
+from subprocess import run
 import sys
 import traceback
 
@@ -64,6 +65,13 @@ def case_value_to_string(case_data, previous_case_data, index):
     diff = case_data[index] - previous_case_data[index]
     diff_string = f"({diff:+,})" if diff != 0 else ""
     return f"{case_data[index]:,} {diff_string}"
+
+
+def get_git_hash():
+    try:
+        return f'({run(["git", "log", "--pretty=format:%h", "-n", "1"], capture_output=True).stdout.decode("ascii")})'
+    except:
+        return ""
 
 
 def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
@@ -126,7 +134,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     )
 
     embed.set_footer(
-        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
+        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
     )
 
     hook = DiscordWebhook(
