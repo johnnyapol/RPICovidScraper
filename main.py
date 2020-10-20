@@ -67,8 +67,7 @@ def case_value_to_string(case_data, previous_case_data, index):
 
 
 def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
-
-    if webhooks is None:
+    if urls is None:
         return print("Skipping posting to discord as no webhooks supplied")
 
     positive_thumbnails = [
@@ -125,19 +124,19 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         url=dashboard_url,
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
-    for url in urls:
-        embed.set_footer(
-            text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
-        )
 
-        hook = DiscordWebhook(
-            url=[url],
-            content="The RPI Covid Dashboard has been updated!",
-            username="RPI Covid Dashboard",
-            avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
-        )
-        hook.add_embed(embed)
-        hook.execute()
+    embed.set_footer(
+        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper"
+    )
+
+    hook = DiscordWebhook(
+        url=urls,
+        content="The RPI Covid Dashboard has been updated!",
+        username="RPI Covid Dashboard",
+        avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
+    )
+    hook.add_embed(embed)
+    hook.execute()
 
 
 def load_previous():
@@ -156,6 +155,7 @@ def save(case_data):
 
 def main():
     global webhooks
+    global DASHBOARD
     previous_case_data = load_previous()
     current_case_data, date = check_for_updates()
 
