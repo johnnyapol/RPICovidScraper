@@ -110,10 +110,12 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     embed.add_embed_field(
         name="Positive Tests (7 days)",
         value=case_value_to_string(case_data, previous_case_data, 1),
+        inline=False,
     )
     embed.add_embed_field(
         name="Total Tests (7 days)",
         value=case_value_to_string(case_data, previous_case_data, 3),
+        inline=False,
     )
     if case_data[1] != 0:
         # Calculate weekly positivity rate
