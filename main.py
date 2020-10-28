@@ -180,7 +180,8 @@ def main():
             else:
                 print("Skipping page archive as we are running in CI mode")
         except Exception as e:
-            print(f"Page archived failed {e}")
+            print(f"Page archived failed")
+            traceback.print_exc()
         post_discord(
             current_case_data, previous_case_data, date, dashboard_url, webhooks
         )
