@@ -142,7 +142,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     else:
         text = f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
 
-    embed.set_footer(text)
+    embed.set_footer(text=text)
 
     hook = DiscordWebhook(
         url=urls,
