@@ -31,6 +31,7 @@ except:
     webhooks = None
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
+PSA = "ATTN: Testing is moving to The Alumni Sports & Recreation Center (The Armory) starting on Thursday, October 29"
 
 
 def check_for_updates():
@@ -75,6 +76,7 @@ def get_git_hash():
 
 
 def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
+    global PSA
     if urls is None:
         return print("Skipping posting to discord as no webhooks supplied")
 
@@ -135,9 +137,12 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
 
-    embed.set_footer(
-        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
-    )
+    if PSA is None:
+        text = "f{date}\n{PSA}"
+    else:
+        text = f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
+
+    embed.set_footer(text)
 
     hook = DiscordWebhook(
         url=urls,
