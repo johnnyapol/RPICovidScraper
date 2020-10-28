@@ -137,7 +137,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
 
-    if PSA is None:
+    if PSA is not None:
         text = "f{date}\n{PSA}"
     else:
         text = f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
