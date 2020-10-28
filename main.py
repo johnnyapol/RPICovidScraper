@@ -31,7 +31,7 @@ except:
     webhooks = None
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
-PSA = "ATTN: Testing is moving to The Alumni Sports & Recreation Center (The Armory) starting on Thursday, October 29"
+PSA = "Testing is moving to The Alumni Sports & Recreation Center (The Armory) starting on Thursday, October 29"
 
 
 def check_for_updates():
@@ -104,6 +104,10 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     else:
         embed.set_thumbnail(url=closed_thumbnail)
 
+    if PSA is not None:
+        embed.add_embed_field(name="ANNOUNCEMENT", value=PSA, inline=False)
+        embed.color = 15844367
+
     embed.add_embed_field(
         name="Positive Tests (24 hours)",
         value=case_value_to_string(case_data, previous_case_data, 0),
@@ -137,12 +141,9 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
     )
 
-    if PSA is not None:
-        text = f"{date}\n{PSA}"
-    else:
-        text = f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
-
-    embed.set_footer(text=text)
+    embed.set_footer(
+        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
+    )
 
     hook = DiscordWebhook(
         url=urls,
