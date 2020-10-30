@@ -31,7 +31,7 @@ except:
     webhooks = None
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
-PSA = "Testing is moving to The Alumni Sports & Recreation Center (The Armory) starting on Thursday, October 29"
+PSA = None
 
 
 def check_for_updates():
