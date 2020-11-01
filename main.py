@@ -88,6 +88,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     negative_thumbnails = [
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
         "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg",
+        "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif",
     ]
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
