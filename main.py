@@ -34,6 +34,7 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 PSA = None
 QUIET = False
 
+
 def check_for_updates():
     global DASHBOARD
     request = requests.get(DASHBOARD)
