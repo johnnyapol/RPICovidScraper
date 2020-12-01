@@ -32,7 +32,7 @@ except:
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
 PSA = None
-QUIET = True
+QUIET = False
 
 def check_for_updates():
     global DASHBOARD
