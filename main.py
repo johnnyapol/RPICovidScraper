@@ -32,7 +32,7 @@ except:
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
 PSA = None
-
+QUIET = True
 
 def check_for_updates():
     global DASHBOARD
@@ -77,6 +77,7 @@ def get_git_hash():
 
 def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     global PSA
+    global QUIET
     if urls is None:
         return print("Skipping posting to discord as no webhooks supplied")
 
@@ -94,6 +95,9 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
     emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀"]
+
+    if QUIET and case_data[0] == 0:
+        return
 
     if case_data[2] < 100:
         if case_data[0] > 0:
