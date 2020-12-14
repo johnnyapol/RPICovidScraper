@@ -116,7 +116,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     embed.add_embed_field(
         name="Positive Tests (24 hours)",
-        value=case_value_to_string(case_data, case_data, 0),
+        value=f"{case_data[0]}",
         inline=False,
     )
     embed.add_embed_field(
