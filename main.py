@@ -91,11 +91,13 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
         "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg",
         "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif",
+        "https://ih1.redbubble.net/image.1877589148.0162/ur,mask_flatlay_front,wide_portrait,750x1000.jpg",
     ]
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀"]
+    # emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀"]
+    emojis = ["🎅", "☃️", "🎄", "🥛🍪"]
 
     if QUIET and case_data[0] == 0:
         return
