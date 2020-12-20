@@ -155,7 +155,15 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     hook = DiscordWebhook(
         url=urls,
-        content="The RPI Covid Dashboard has been updated!",
+        content=choice(
+            [
+                "The RPI Covid Dashboard has been updated!",
+                "I got yer COVID cases right here!",
+                "Special delivery!",
+                "Beep beep boop",
+                "I found some data!",
+            ]
+        ),
         username="RPI Covid Dashboard",
         avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
     )
