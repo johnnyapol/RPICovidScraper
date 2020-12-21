@@ -85,6 +85,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     positive_thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://i.kym-cdn.com/photos/images/newsfeed/000/675/645/2c7.gif",
+        "https://media.discordapp.net/attachments/783375197604413445/790625854202839100/image0.png",
     ]
 
     negative_thumbnails = [
