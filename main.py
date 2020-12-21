@@ -117,7 +117,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         embed.color = 15844367
 
     embed.add_embed_field(
-        name="Positive Tests (24 hours)",
+        name="New Positive Tests",
         value=f"{case_data[0]}",
         inline=False,
     )
@@ -127,7 +127,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         inline=False,
     )
     embed.add_embed_field(
-        name="Total Tests (7 days)",
+        name="Weekly Test Count",
         value=case_value_to_string(case_data, previous_case_data, 3),
         inline=False,
     )
@@ -136,11 +136,11 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         pcr = (case_data[1] / case_data[3]) * 100
         embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
-        name="Total Positive Tests (since August 1st)",
+        name="Total Positive Tests",
         value=case_value_to_string(case_data, previous_case_data, 2),
     )
     embed.add_embed_field(
-        name="Total Tests (since August 1st)",
+        name="Total Tests",
         value=case_value_to_string(case_data, previous_case_data, 4),
     )
     embed.set_author(
@@ -201,7 +201,7 @@ def main():
                 dashboard_url = savepagenow.capture(DASHBOARD, accept_cache=True)
             else:
                 print("Skipping page archive as we are running in CI mode")
-        except Exception as e:
+        except:
             print(f"Page archived failed")
             traceback.print_exc()
         post_discord(
