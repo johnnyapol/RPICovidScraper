@@ -193,7 +193,18 @@ def main():
 
     ci = any(x.lower() == "--ci" for x in sys.argv)
 
-    if current_case_data != previous_case_data:
+    # Only post under the following conditions:
+    # 1. There is new data from RPI
+    #           - AND -
+    # 2. there are new positive tests OR new weekly/total numbers reported
+    # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
+    if current_case_data != previous_case_data and (
+        current_case_data[0] != 0
+        or any(
+            current_case_data[x] != previous_case_data[x]
+            for x in range(2, len(current_case_data))
+        )
+    ):
         dashboard_url = DASHBOARD
         try:
             # We don't want to abuse the Wayback Machine in actions
