@@ -97,8 +97,8 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    # emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️"]
-    emojis = ["🎊", "🎆", "🍾", "🌃", "🥳"]
+    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️"]
+
     if QUIET and case_data[0] == 0:
         return
 
