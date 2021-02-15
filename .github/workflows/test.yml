@@ -19,5 +19,5 @@ jobs:
             CI_WEBHOOK: ${{ secrets.TEST_WEBHOOK }}
         run: |
             echo "import os" > webhook_urls.py
-            echo "webhooks = os.environ[\"CI_WEBHOOK\"].split(\",\") if \"CI_WEBHOOK\" in os.environ else None" >> webhook_urls.py
+            echo "webhooks = os.environ[\"CI_WEBHOOK\"].split(\",\") if \"CI_WEBHOOK\" in os.environ else None" >> config.py
             python main.py --ci
