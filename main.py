@@ -39,11 +39,6 @@ QUIET = False
 
 
 class CovidData:
-    rpi_array: list
-    rolling_array: list
-    last_updated: date
-    array_index: int
-
     def __init__(self):
         self.rpi_array = [0] * 5
         self.rolling_array = [0] * 14
@@ -73,6 +68,7 @@ class CovidData:
         # Write out next data
         self.rolling_array[self.array_index] = case_data[0]
         self.rpi_array = case_data
+        self.last_updated = today
 
     def get_rolling(self):
         return sum(self.rolling_array)
