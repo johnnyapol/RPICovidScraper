@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Usage: ./main.py
+# Usage: ./rpi.py
 """
 Copyright (C) 2020 John C. Allwein 'johnnyapol' (admin@johnnyapol.me)
 
@@ -16,68 +16,23 @@ from random import choice
 from subprocess import run
 import sys
 import traceback
-from datetime import date, timedelta
-from copy import deepcopy
 
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordEmbed, DiscordWebhook
-from dataclasses import dataclass
 import savepagenow
 
-# Import configuration (if available)
 try:
     import webhook_urls
 
-    WEBHOOKS = webhook_urls.webhooks
-    PSA = webhook_urls.PSA
-    QUIET = webhook_urls.QUIET
+    webhooks = webhook_urls.webhooks
 except:
     print("No discord webhooks supplied - data will just be stored locally")
     traceback.print_exc()
-    WEBHOOKS = None
-    PSA = None
-    QUIET = False
+    webhooks = None
 
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
-
-
-class CovidData:
-    def __init__(self):
-        self.rpi_array = [0] * 5
-        self.rolling_array = [0] * 14
-        self.last_updated = date.today()
-        self.array_index = 0
-
-    def increment_index(self):
-        self.array_index = (self.array_index + 1) % 14
-
-    def update(self, case_data):
-        # New instance --> setup data
-        today = date.today()
-        if self.last_updated == None:
-            self.array_index = 0
-            self.last_updated = today
-        elif today != self.last_updated:
-            assert today > self.last_updated
-            delta = (today - self.last_updated).days - 1
-            self.increment_index()
-
-            # Fill in 0s
-            while delta != 0:
-                self.rolling_array[self.array_index] = 0
-                self.increment_index()
-                delta -= 1
-
-        # Write out next data
-        self.rolling_array[self.array_index] = case_data[0]
-        self.rpi_array = case_data
-        self.last_updated = today
-
-    def get_rolling(self):
-        return sum(self.rolling_array)
-
-    def get_case_data(self):
-        return self.rpi_array
+PSA = None
+QUIET = False
 
 
 def check_for_updates():
@@ -121,19 +76,15 @@ def get_git_hash():
         return ""
 
 
-def post_discord(
-    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url
-):
-    global WEBHOOKS
+def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     global PSA
     global QUIET
-    if WEBHOOKS is None:
+    if urls is None:
         return print("Skipping posting to discord as no webhooks supplied")
 
     positive_thumbnails = [
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://i.kym-cdn.com/photos/images/newsfeed/000/675/645/2c7.gif",
-        "https://media.discordapp.net/attachments/783375197604413445/790625854202839100/image0.png",
     ]
 
     negative_thumbnails = [
@@ -145,19 +96,18 @@ def post_discord(
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️"]
+    # emojis = ["❤️", "✨", "🥓", "🦄", "🌯", "🍺", "🧻", "🐍", "🦀 unsafe 🦀"]
+    emojis = ["🎅", "☃️", "🎄", "🥛🍪"]
 
     if QUIET and case_data[0] == 0:
         return
 
-    embed = DiscordEmbed()
-
-    if rolling < 30:
+    if case_data[2] < 100:
         if case_data[0] > 0:
-            embed.set_color(15158332)
+            embed = DiscordEmbed(color=15158332)
             embed.set_thumbnail(url=choice(positive_thumbnails))
         else:
-            embed.set_color(3066993)
+            embed = DiscordEmbed(color=3066993)
             embed.set_thumbnail(url=choice(negative_thumbnails))
     else:
         embed.set_thumbnail(url=closed_thumbnail)
@@ -167,7 +117,7 @@ def post_discord(
         embed.color = 15844367
 
     embed.add_embed_field(
-        name="New Positive Tests",
+        name="Positive Tests (24 hours)",
         value=f"{case_data[0]}",
         inline=False,
     )
@@ -176,18 +126,8 @@ def post_discord(
         value=case_value_to_string(case_data, previous_case_data, 1),
         inline=False,
     )
-
-    # As a consequence of the fact that RPI doesn't do a 2-week rolling average, it's on us to compute it -- but we may not have historical data
-    # There *will* be people on discord complaining if this is less than the 1 week count, so don't display it if we don't have at least that much data
-    if rolling >= case_data[1]:
-        embed.add_embed_field(
-            name="Positive Tests (14 days)",
-            value=case_value_to_string([rolling], [old_rolling], 0),
-            inline=False,
-        )
-
     embed.add_embed_field(
-        name="Weekly Test Count",
+        name="Total Tests (7 days)",
         value=case_value_to_string(case_data, previous_case_data, 3),
         inline=False,
     )
@@ -196,11 +136,11 @@ def post_discord(
         pcr = (case_data[1] / case_data[3]) * 100
         embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
-        name="Total Positive Tests",
+        name="Total Positive Tests (since August 1st)",
         value=case_value_to_string(case_data, previous_case_data, 2),
     )
     embed.add_embed_field(
-        name="Total Tests",
+        name="Total Tests (since August 1st)",
         value=case_value_to_string(case_data, previous_case_data, 4),
     )
     embed.set_author(
@@ -214,16 +154,8 @@ def post_discord(
     )
 
     hook = DiscordWebhook(
-        url=WEBHOOKS,
-        content=choice(
-            [
-                "The RPI Covid Dashboard has been updated!",
-                "I got yer COVID cases right here!",
-                "Special delivery!",
-                "Beep beep boop",
-                "I found some data!",
-            ]
-        ),
+        url=urls,
+        content="The RPI Covid Dashboard has been updated!",
         username="RPI Covid Dashboard",
         avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
     )
@@ -237,7 +169,7 @@ def load_previous():
             return pickle.load(file)
     except:
         print("Cache read failed")
-        return CovidData()
+        return [0, 0, 0, 0, 0]
 
 
 def save(case_data):
@@ -246,50 +178,8 @@ def save(case_data):
 
 
 def main():
+    global webhooks
     global DASHBOARD
-    covid_data = load_previous()
-    previous_case_data = deepcopy(covid_data.get_case_data())
-    current_case_data, date = check_for_updates()
-
-    ci = any(x.lower() == "--ci" for x in sys.argv)
-
-    # Only post under the following conditions:
-    # 1. There is new data from RPI
-    #           - AND -
-    # 2. there are new positive tests OR new weekly/total numbers reported
-    # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
-    if current_case_data != previous_case_data and (
-        current_case_data[0] != 0
-        or any(
-            current_case_data[x] != previous_case_data[x]
-            for x in range(2, len(current_case_data))
-        )
-    ):
-        dashboard_url = DASHBOARD
-        try:
-            # We don't want to abuse the Wayback Machine in actions
-            if not ci:
-                dashboard_url = savepagenow.capture(DASHBOARD, accept_cache=True)
-            else:
-                print("Skipping page archive as we are running in CI mode")
-        except:
-            print(f"Page archived failed")
-            traceback.print_exc()
-
-        old_rolling = covid_data.get_rolling()
-        covid_data.update(current_case_data)
-
-        post_discord(
-            covid_data.get_rolling(),
-            old_rolling,
-            current_case_data,
-            previous_case_data,
-            date,
-            dashboard_url
-        )
-
-        save(covid_data)
-    print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
 
 if __name__ == "__main__":
