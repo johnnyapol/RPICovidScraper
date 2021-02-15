@@ -1,4 +1,4 @@
 *.pyc
 .cache
 start.sh
-webhook_urls.py
+config.py

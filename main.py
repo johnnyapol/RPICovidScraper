@@ -26,11 +26,11 @@ import savepagenow
 
 # Import configuration (if available)
 try:
-    import webhook_urls
+    import config
 
-    WEBHOOKS = webhook_urls.webhooks
-    PSA = webhook_urls.PSA
-    QUIET = webhook_urls.QUIET
+    WEBHOOKS = config.webhooks
+    PSA = config.PSA
+    QUIET = config.QUIET
 except:
     print("No discord webhooks supplied - data will just be stored locally")
     traceback.print_exc()
@@ -285,7 +285,7 @@ def main():
             current_case_data,
             previous_case_data,
             date,
-            dashboard_url
+            dashboard_url,
         )
 
         save(covid_data)
