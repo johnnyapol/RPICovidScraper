@@ -150,12 +150,14 @@ def post_discord(
     if QUIET and case_data[0] == 0:
         return
 
+    embed = DiscordEmbed()
+
     if rolling < 30:
         if case_data[0] > 0:
-            embed = DiscordEmbed(color=15158332)
+            embed.set_color(15158332)
             embed.set_thumbnail(url=choice(positive_thumbnails))
         else:
-            embed = DiscordEmbed(color=3066993)
+            embed.set_color(3066993)
             embed.set_thumbnail(url=choice(negative_thumbnails))
     else:
         embed.set_thumbnail(url=closed_thumbnail)
@@ -180,7 +182,7 @@ def post_discord(
     if rolling >= case_data[1]:
         embed.add_embed_field(
             name="Positive Tests (14 days)",
-            value=case_value_to_string(rolling, [old_rolling], 0),
+            value=case_value_to_string([rolling], [old_rolling], 0),
             inline=False,
         )
 
