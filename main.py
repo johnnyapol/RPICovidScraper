@@ -16,9 +16,12 @@ from random import choice
 from subprocess import run
 import sys
 import traceback
+from datetime import date, timedelta
+from copy import deepcopy
 
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordEmbed, DiscordWebhook
+from dataclasses import dataclass
 import savepagenow
 
 try:
@@ -33,6 +36,49 @@ except:
 DASHBOARD = "https://covid19.rpi.edu/dashboard"
 PSA = None
 QUIET = False
+
+
+class CovidData:
+    rpi_array: list
+    rolling_array: list
+    last_updated: date
+    array_index: int
+
+    def __init__(self):
+        self.rpi_array = [0] * 5
+        self.rolling_array = [0] * 14
+        self.last_updated = date.today()
+        self.array_index = 0
+
+    def increment_index(self):
+        self.array_index = (self.array_index + 1) % 14
+
+    def update(self, case_data):
+        # New instance --> setup data
+        today = date.today()
+        if self.last_updated == None:
+            self.array_index = 0
+            self.last_updated = today
+        elif today != self.last_updated:
+            assert today > self.last_updated
+            delta = (today - self.last_updated).days - 1
+            self.increment_index()
+
+            # Fill in 0s
+            while delta != 0:
+                self.rolling_array[self.array_index] = 0
+                self.increment_index()
+                delta -= 1
+
+        # Write out next data
+        self.rolling_array[self.array_index] = case_data[0]
+        self.rpi_array = case_data
+
+    def get_rolling(self):
+        return sum(self.rolling_array)
+
+    def get_case_data(self):
+        return self.rpi_array
 
 
 def check_for_updates():
@@ -76,7 +122,9 @@ def get_git_hash():
         return ""
 
 
-def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
+def post_discord(
+    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, urls
+):
     global PSA
     global QUIET
     if urls is None:
@@ -102,7 +150,7 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
     if QUIET and case_data[0] == 0:
         return
 
-    if case_data[2] < 100:
+    if rolling < 30:
         if case_data[0] > 0:
             embed = DiscordEmbed(color=15158332)
             embed.set_thumbnail(url=choice(positive_thumbnails))
@@ -126,6 +174,16 @@ def post_discord(case_data, previous_case_data, date, dashboard_url, urls):
         value=case_value_to_string(case_data, previous_case_data, 1),
         inline=False,
     )
+
+    # As a consequence of the fact that RPI doesn't do a 2-week rolling average, it's on us to compute it -- but we may not have historical data
+    # There *will* be people on discord complaining if this is less than the 1 week count, so don't display it if we don't have at least that much data
+    if rolling >= case_data[1]:
+        embed.add_embed_field(
+            name="Positive Tests (14 days)",
+            value=case_value_to_string(rolling, [old_rolling], 0),
+            inline=False,
+        )
+
     embed.add_embed_field(
         name="Weekly Test Count",
         value=case_value_to_string(case_data, previous_case_data, 3),
@@ -177,7 +235,7 @@ def load_previous():
             return pickle.load(file)
     except:
         print("Cache read failed")
-        return [0, 0, 0, 0, 0]
+        return CovidData()
 
 
 def save(case_data):
@@ -188,7 +246,8 @@ def save(case_data):
 def main():
     global webhooks
     global DASHBOARD
-    previous_case_data = load_previous()
+    covid_data = load_previous()
+    previous_case_data = deepcopy(covid_data.get_case_data())
     current_case_data, date = check_for_updates()
 
     ci = any(x.lower() == "--ci" for x in sys.argv)
@@ -215,10 +274,21 @@ def main():
         except:
             print(f"Page archived failed")
             traceback.print_exc()
+
+        old_rolling = covid_data.get_rolling()
+        covid_data.update(current_case_data)
+
         post_discord(
-            current_case_data, previous_case_data, date, dashboard_url, webhooks
+            covid_data.get_rolling(),
+            old_rolling,
+            current_case_data,
+            previous_case_data,
+            date,
+            dashboard_url,
+            webhooks,
         )
-        save(current_case_data)
+
+        save(covid_data)
     print(f"Done. Old: {previous_case_data} New: {current_case_data}")
 
 
