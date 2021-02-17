@@ -52,12 +52,8 @@ class CovidData:
         self.array_index = (self.array_index + 1) % 14
 
     def update(self, case_data):
-        # New instance --> setup data
         today = date.today()
-        if self.last_updated == None:
-            self.array_index = 0
-            self.last_updated = today
-        elif today != self.last_updated:
+        if today != self.last_updated:
             assert today > self.last_updated
             delta = (today - self.last_updated).days - 1
             self.increment_index()
