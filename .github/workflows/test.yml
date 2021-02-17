@@ -20,4 +20,6 @@ jobs:
         run: |
             echo "import os" > config.py
             echo "webhooks = os.environ[\"CI_WEBHOOK\"].split(\",\") if \"CI_WEBHOOK\" in os.environ else None" >> config.py
+            echo "PSA=None" >> config.py
+            echo "QUIET=False" >> config.py
             python main.py --ci
