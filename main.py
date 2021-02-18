@@ -173,14 +173,11 @@ def post_discord(
         inline=False,
     )
 
-    # As a consequence of the fact that RPI doesn't do a 2-week rolling average, it's on us to compute it -- but we may not have historical data
-    # There *will* be people on discord complaining if this is less than the 1 week count, so don't display it if we don't have at least that much data
-    if rolling >= case_data[1]:
-        embed.add_embed_field(
-            name="Positive Tests (14 days)",
-            value=case_value_to_string([rolling], [old_rolling], 0),
-            inline=False,
-        )
+    embed.add_embed_field(
+        name="Positive Tests (14 days)",
+        value=case_value_to_string([rolling], [old_rolling], 0),
+        inline=False,
+    )
 
     embed.add_embed_field(
         name="Weekly Test Count",
