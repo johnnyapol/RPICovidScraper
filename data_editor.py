@@ -35,8 +35,8 @@ if __name__ == "__main__":
     assert new_array_index >= 0
 
     # pad off 0s till we get to 14
-    while len(data.rolling_array) != 14:
-        data.rolling_array.append(0)
+    while len(new_rolling) != 14:
+        new_rolling.append(0)
 
     data.rolling_array = new_rolling
     data.array_index = new_array_index
