@@ -282,7 +282,9 @@ def main():
         )
 
         save(covid_data)
-    print(f"Done. Old: {previous_case_data} New: {current_case_data}\n Rolling: {covid_data.get_rolling()}")
+    print(
+        f"Done. Old: {previous_case_data} New: {current_case_data}\n Rolling: {covid_data.get_rolling()}"
+    )
 
 
 if __name__ == "__main__":
