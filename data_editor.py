@@ -34,6 +34,10 @@ if __name__ == "__main__":
     print("New last updated: ", new_day)
     assert new_array_index >= 0
 
+    # pad off 0s till we get to 14
+    while len(data.rolling_array) != 14:
+        data.rolling_array.append(0)
+
     data.rolling_array = new_rolling
     data.array_index = new_array_index
     data.last_updated = new_day
