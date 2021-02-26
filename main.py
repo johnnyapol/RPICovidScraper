@@ -75,6 +75,14 @@ class CovidData:
     def get_case_data(self):
         return self.rpi_array
 
+    def get_rolling_str(self):
+        val = (
+            lambda x: f"{self.rolling_array[x]} <-- today"
+            if x == self.array_index
+            else str(self.rolling_array[x])
+        )
+        return f"[{', '.join(val(x) for x in chain(range(self.array_index+1, 14), range(self.array_index+1)))}]"
+
 
 def check_for_updates():
     global DASHBOARD
@@ -118,12 +126,7 @@ def get_git_hash():
 
 
 def post_discord(
-    rolling,
-    old_rolling,
-    case_data,
-    previous_case_data,
-    date,
-    dashboard_url,
+    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, array
 ):
     global WEBHOOKS
     global PSA
@@ -179,7 +182,7 @@ def post_discord(
     )
 
     embed.add_embed_field(
-        name="Positive Tests (14 days)",
+        name="Positive Tests (14 days)¹",
         value=case_value_to_string([rolling], [old_rolling], 0),
         inline=False,
     )
@@ -208,7 +211,7 @@ def post_discord(
     )
 
     embed.set_footer(
-        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
+        text=f"¹ 14 day data: {array}\n{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
     )
 
     hook = DiscordWebhook(
@@ -284,6 +287,7 @@ def main():
             previous_case_data,
             date,
             dashboard_url,
+            covid_data.get_rolling_str(),
         )
 
         save(covid_data)
