@@ -18,6 +18,7 @@ import sys
 import traceback
 from datetime import date, timedelta
 from copy import deepcopy
+from itertools import chain
 
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordEmbed, DiscordWebhook
@@ -80,7 +81,7 @@ class CovidData:
             if x == self.array_index
             else str(self.rolling_array[x])
         )
-        return f"[{', '.join(val(x) for x in range(14))}]"
+        return f"[{', '.join(val(x) for x in chain(range(self.array_index+1, 13), range(self.array_index+1)))}]"
 
 
 def check_for_updates():
