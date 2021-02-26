@@ -264,9 +264,6 @@ def create_graph(iterator):
         plot.plot(dates, [30] * 14, "g--", label="trigger level 1")
     plot.xticks(dates, dates, rotation=45)
     plot.legend()
-    # Add individual day labels
-    for i, v in enumerate(x):
-        plot.text(i, v, str(v), color="blue", fontweight="bold")
     data = BytesIO()
     plot.savefig(data, format="png")
     data.seek(0)
