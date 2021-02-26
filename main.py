@@ -253,7 +253,6 @@ def create_graph(iterator):
     cum = [x[0]]
     for i in range(1, len(x)):
         cum.append(cum[-1] + x[i])
-    print(x)
     # thanks to https://www.tutorialspoint.com/matplotlib/matplotlib_bar_plot.htm for help
     today = date.today()
     monthday = lambda d: f"{d.month}-{d.day}"
@@ -263,9 +262,11 @@ def create_graph(iterator):
     plot.plot(dates, cum, color="orange", label="cumulative total")
     if cum[-1] > 15:
         plot.plot(dates, [30] * 14, "g--", label="trigger level 1")
-    plot.xticks(dates, dates, rotation=90)
+    plot.xticks(dates, dates, rotation=45)
     plot.legend()
-    # plot.show()
+    # Add individual day labels
+    for i, v in enumerate(x):
+        plot.text(i, v, str(v), color="blue", fontweight="bold")
     data = BytesIO()
     plot.savefig(data, format="png")
     data.seek(0)
