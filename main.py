@@ -19,9 +19,11 @@ import traceback
 from datetime import date, timedelta
 from copy import deepcopy
 from itertools import chain
+from io import BytesIO
 
 from bs4 import BeautifulSoup
 from discord_webhook import DiscordEmbed, DiscordWebhook
+import matplotlib.pyplot as plot
 import savepagenow
 
 # Import configuration (if available)
@@ -75,13 +77,8 @@ class CovidData:
     def get_case_data(self):
         return self.rpi_array
 
-    def get_rolling_str(self):
-        val = (
-            lambda x: f"{self.rolling_array[x]} <-- today"
-            if x == self.array_index
-            else str(self.rolling_array[x])
-        )
-        return f"[{', '.join(val(x) for x in chain(range(self.array_index+1, 14), range(self.array_index+1)))}]"
+    def get_rolling_iterator(self):
+        return chain(self.rolling_array[self.array_index+1:14], self.rolling_array[:self.array_index+1])
 
 
 def check_for_updates():
@@ -126,7 +123,7 @@ def get_git_hash():
 
 
 def post_discord(
-    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, array
+    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, graph
 ):
     global WEBHOOKS
     global PSA
@@ -182,7 +179,7 @@ def post_discord(
     )
 
     embed.add_embed_field(
-        name="Positive Tests (14 days)¹",
+        name="Positive Tests (14 days)",
         value=case_value_to_string([rolling], [old_rolling], 0),
         inline=False,
     )
@@ -211,7 +208,7 @@ def post_discord(
     )
 
     embed.set_footer(
-        text=f"¹ 14 day data: {array}\n{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
+        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
     )
 
     hook = DiscordWebhook(
@@ -228,6 +225,8 @@ def post_discord(
         username="RPI Covid Dashboard",
         avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
     )
+    hook.add_file(file=graph.read(), filename='graph.png')
+    embed.set_image(url="attachment://graph.png")
     hook.add_embed(embed)
     hook.execute()
 
@@ -244,6 +243,22 @@ def load_previous():
 def save(case_data):
     with open(".cache", "wb") as file:
         pickle.dump(case_data, file)
+
+def create_graph(iterator):
+    x = [int(z) for z in iterator]
+    print(x)
+    # thanks to https://www.tutorialspoint.com/matplotlib/matplotlib_bar_plot.htm for help
+    today = date.today()
+    monthday = lambda d: f"{d.month}-{d.day}"
+    dates = [monthday(today - timedelta(days=x)) for x in range(13,-1,-1)]
+    plot.bar(dates, x, color='red')
+    plot.xticks(dates,dates,rotation=90)
+    #plot.show()
+    data = BytesIO()
+    plot.savefig(data, format='png')
+    data.seek(0)
+    return data
+    
 
 
 def main():
@@ -287,7 +302,7 @@ def main():
             previous_case_data,
             date,
             dashboard_url,
-            covid_data.get_rolling_str(),
+            create_graph(covid_data.get_rolling_iterator())
         )
 
         save(covid_data)
