@@ -76,7 +76,7 @@ class CovidData:
 
     def get_rolling_str(self):
         val = (
-            lambda x: f"{self.rolling_array[x]} *"
+            lambda x: f"{self.rolling_array[x]} <-- today"
             if x == self.array_index
             else str(self.rolling_array[x])
         )
