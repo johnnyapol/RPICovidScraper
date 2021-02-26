@@ -258,7 +258,8 @@ def create_graph(iterator):
     plot.title(f"Previous 14 days")
     plot.bar(dates, x, color='red', label='daily cases')
     plot.plot(dates, cum, color='orange', label='cumulative total')
-    plot.plot(dates, [30] * 14, 'g--', label='trigger level 1')
+    if x[-1] > 15:
+        plot.plot(dates, [30] * 14, 'g--', label='trigger level 1')
     plot.xticks(dates, dates, rotation=90)
     plot.legend()
     # plot.show()
