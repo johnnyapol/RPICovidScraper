@@ -81,7 +81,7 @@ class CovidData:
             if x == self.array_index
             else str(self.rolling_array[x])
         )
-        return f"[{', '.join(val(x) for x in chain(range(self.array_index+1, 13), range(self.array_index+1)))}]"
+        return f"[{', '.join(val(x) for x in chain(range(self.array_index+1, 14), range(self.array_index+1))}]"
 
 
 def check_for_updates():
