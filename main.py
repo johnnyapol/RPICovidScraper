@@ -78,7 +78,7 @@ class CovidData:
         return self.rpi_array
 
     def get_rolling_iterator(self):
-        return chain(self.rolling_array[self.array_index+1:14], self.rolling_array[:self.array_index+1])
+        return chain(self.rolling_array[self.array_index + 1:14], self.rolling_array[:self.array_index + 1])
 
 
 def check_for_updates():
@@ -102,8 +102,8 @@ def check_for_updates():
         [
             int("".join(("".join(x.text.strip().split(" "))).split(",")))
             for x in soup.find("div", {"class": header}).findAll(
-                "div", {"class": header2}
-            )
+            "div", {"class": header2}
+        )
         ],
         soup.find("div", {"class": date_header}).text,
     )
@@ -123,7 +123,7 @@ def get_git_hash():
 
 
 def post_discord(
-    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, graph
+        rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, graph
 ):
     global WEBHOOKS
     global PSA
@@ -244,21 +244,29 @@ def save(case_data):
     with open(".cache", "wb") as file:
         pickle.dump(case_data, file)
 
+
 def create_graph(iterator):
     x = [int(z) for z in iterator]
+    cum = [x[0]]
+    for i in range(1, len(x)):
+        cum.append(cum[-1] + x[i])
     print(x)
     # thanks to https://www.tutorialspoint.com/matplotlib/matplotlib_bar_plot.htm for help
     today = date.today()
     monthday = lambda d: f"{d.month}-{d.day}"
-    dates = [monthday(today - timedelta(days=x)) for x in range(13,-1,-1)]
-    plot.bar(dates, x, color='red')
-    plot.xticks(dates,dates,rotation=90)
-    #plot.show()
+    dates = [monthday(today - timedelta(days=x)) for x in range(13, -1, -1)]
+    plot.title(f"Previous 14 days")
+    plot.bar(dates, x, color='red', label='daily cases')
+    plot.plot(dates, cum, color='orange', label='cumulative total')
+    if x[-1] > 15:
+        plot.plot(dates, [30] * 14, 'g--', label='trigger level 1')
+    plot.xticks(dates, dates, rotation=90)
+    plot.legend()
+    # plot.show()
     data = BytesIO()
     plot.savefig(data, format='png')
     data.seek(0)
     return data
-    
 
 
 def main():
@@ -275,12 +283,12 @@ def main():
     # 2. there are new positive tests OR new weekly/total numbers reported
     # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
     if current_case_data != previous_case_data and (
-        current_case_data[0] != 0
-        or any(
-            current_case_data[x] != previous_case_data[x]
-            for x in range(2, len(current_case_data))
-        )
-    ):
+            current_case_data[0] != 0
+            or any(
+        current_case_data[x] != previous_case_data[x]
+        for x in range(2, len(current_case_data))
+    )
+    ) or True:
         dashboard_url = DASHBOARD
         try:
             # We don't want to abuse the Wayback Machine in actions
