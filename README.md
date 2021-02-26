@@ -7,7 +7,12 @@ Scrapes https://covid19.rpi.edu/dashboard and (optionally) posts to discord chan
 
 python3 main.py or ./main.py
 
-See the webhook_urls.py.sample for information on configuring discord webhooks.
+See the config.py.sample for information on configuring discord posting.
+
+# Features
+- COVID Dashboard scraping
+- Additionally tracks 2 week case data as RPI/NYS COVID "Trigger Protocols" utilize that data
+- Weekly positivity rate tracking
 
 # Dependencies
 - Python 3.6 or later
