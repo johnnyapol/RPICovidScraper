@@ -210,7 +210,7 @@ def post_discord(
     )
 
     embed.set_footer(
-        text=f"¹ 14 day case data: {array}\n{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
+        text=f"¹ 14 day data: {array}\n{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
     )
 
     hook = DiscordWebhook(
