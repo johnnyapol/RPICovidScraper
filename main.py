@@ -266,7 +266,7 @@ def create_graph(iterator):
     plot.legend()
     data = BytesIO()
     plot.subplots_adjust(bottom=0.17)
-    plot.ylabel("Number of cases")
+    plot.ylabel("Number of positive tests")
     plot.xlabel("Day reported")
     now = datetime.now()
     plot.figtext(
