@@ -16,7 +16,7 @@ from random import choice
 from subprocess import run
 import sys
 import traceback
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from copy import deepcopy
 from itertools import chain
 from io import BytesIO
@@ -265,6 +265,11 @@ def create_graph(iterator):
     plot.xticks(dates, dates, rotation=45)
     plot.legend()
     data = BytesIO()
+    plot.subplots_adjust(bottom=0.17)
+    plot.ylabel("Number of cases")
+    plot.xlabel("Day reported")
+    now = datetime.now()
+    plot.figtext(0.5, 0.01, f"Generated on {now.strftime('%m/%d %H:%M')} EST", ha="center", fontsize=8)
     plot.savefig(data, format="png")
     data.seek(0)
     return data
@@ -289,7 +294,7 @@ def main():
             current_case_data[x] != previous_case_data[x]
             for x in range(2, len(current_case_data))
         )
-    ):
+    ) or True:
         dashboard_url = DASHBOARD
         try:
             # We don't want to abuse the Wayback Machine in actions
