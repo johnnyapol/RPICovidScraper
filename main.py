@@ -49,6 +49,7 @@ class CovidData:
         self.rolling_array = [0] * 14
         self.last_updated = date.today()
         self.array_index = 0
+        self.historicalData = {}
 
     def increment_index(self):
         self.array_index = (self.array_index + 1) % 14
@@ -70,6 +71,14 @@ class CovidData:
         self.rolling_array[self.array_index] = case_data[0]
         self.rpi_array = case_data
         self.last_updated = today
+
+        #Backwards compatability
+        try:
+            self.historicalData[today] = case_data
+        except AttributeError:
+            self.historicalData = {}
+            self.historicalData[today] = case_data
+
 
     def get_rolling(self):
         return sum(self.rolling_array)
