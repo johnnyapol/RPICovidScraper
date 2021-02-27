@@ -269,7 +269,13 @@ def create_graph(iterator):
     plot.ylabel("Number of cases")
     plot.xlabel("Day reported")
     now = datetime.now()
-    plot.figtext(0.5, 0.01, f"Generated on {now.strftime('%m/%d %H:%M')} EST", ha="center", fontsize=8)
+    plot.figtext(
+        0.5,
+        0.01,
+        f"Generated on {now.strftime('%m/%d %H:%M')} EST",
+        ha="center",
+        fontsize=8,
+    )
     plot.savefig(data, format="png")
     data.seek(0)
     return data
@@ -288,13 +294,17 @@ def main():
     #           - AND -
     # 2. there are new positive tests OR new weekly/total numbers reported
     # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
-    if current_case_data != previous_case_data and (
-        current_case_data[0] != 0
-        or any(
-            current_case_data[x] != previous_case_data[x]
-            for x in range(2, len(current_case_data))
+    if (
+        current_case_data != previous_case_data
+        and (
+            current_case_data[0] != 0
+            or any(
+                current_case_data[x] != previous_case_data[x]
+                for x in range(2, len(current_case_data))
+            )
         )
-    ) or True:
+        or True
+    ):
         dashboard_url = DASHBOARD
         try:
             # We don't want to abuse the Wayback Machine in actions
