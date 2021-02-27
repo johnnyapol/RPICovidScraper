@@ -156,7 +156,7 @@ def post_discord(
 
     embed = DiscordEmbed()
 
-    if rolling < 30:
+    if rolling <= 30:
         if case_data[0] > 0:
             embed.set_color(15158332)
             embed.set_thumbnail(url=choice(positive_thumbnails))
