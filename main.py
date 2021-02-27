@@ -145,11 +145,12 @@ def post_discord(
         "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg",
         "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif",
         "https://ih1.redbubble.net/image.1877589148.0162/ur,mask_flatlay_front,wide_portrait,750x1000.jpg",
+        "https://giphy.com/gifs/UF-gators-gatorswearmasks-wear-masks-KHEgvyrgYnL9RW08h6"
     ]
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️"]
+    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
 
     if QUIET and case_data[0] == 0:
         return
