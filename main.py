@@ -303,7 +303,6 @@ def main():
                 for x in range(2, len(current_case_data))
             )
         )
-        or True
     ):
         dashboard_url = DASHBOARD
         try:
