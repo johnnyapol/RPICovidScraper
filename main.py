@@ -72,13 +72,12 @@ class CovidData:
         self.rpi_array = case_data
         self.last_updated = today
 
-        #Backwards compatability
+        # Backwards compatability
         try:
             self.historicalData[today] = case_data
         except AttributeError:
             self.historicalData = {}
             self.historicalData[today] = case_data
-
 
     def get_rolling(self):
         return sum(self.rolling_array)
