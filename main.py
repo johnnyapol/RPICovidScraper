@@ -304,14 +304,11 @@ def main():
     #           - AND -
     # 2. there are new positive tests OR new weekly/total numbers reported
     # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
-    if (
-        current_case_data != previous_case_data
-        and (
-            current_case_data[0] != 0
-            or any(
-                current_case_data[x] != previous_case_data[x]
-                for x in range(2, len(current_case_data))
-            )
+    if current_case_data != previous_case_data and (
+        current_case_data[0] != 0
+        or any(
+            current_case_data[x] != previous_case_data[x]
+            for x in range(2, len(current_case_data))
         )
     ):
         dashboard_url = DASHBOARD
