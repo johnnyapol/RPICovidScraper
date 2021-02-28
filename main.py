@@ -268,7 +268,7 @@ def create_graph(iterator):
     monthday = lambda d: f"{d.month}-{d.day}"
     dates = [monthday(today - timedelta(days=x)) for x in range(13, -1, -1)]
     plot.title(f"Previous 14 days")
-    plot.bar(dates, x, color="red", label="daily cases")
+    plot.bar(dates, x, color="red", label="daily positive tests")
     plot.plot(dates, cum, color="orange", label="cumulative total")
     if cum[-1] > 15:
         plot.plot(dates, [30] * 14, "g--", label="trigger level 1")
