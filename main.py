@@ -49,6 +49,7 @@ class CovidData:
         self.rolling_array = [0] * 14
         self.last_updated = date.today()
         self.array_index = 0
+        self.historicalData = {}
 
     def increment_index(self):
         self.array_index = (self.array_index + 1) % 14
@@ -70,6 +71,13 @@ class CovidData:
         self.rolling_array[self.array_index] = case_data[0]
         self.rpi_array = case_data
         self.last_updated = today
+
+        # Backwards compatability
+        try:
+            self.historicalData[today] = case_data
+        except AttributeError:
+            self.historicalData = {}
+            self.historicalData[today] = case_data
 
     def get_rolling(self):
         return sum(self.rolling_array)
@@ -145,11 +153,13 @@ def post_discord(
         "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg",
         "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif",
         "https://ih1.redbubble.net/image.1877589148.0162/ur,mask_flatlay_front,wide_portrait,750x1000.jpg",
+        "https://media.giphy.com/media/KHEgvyrgYnL9RW08h6/giphy.gif",
+        "https://media.giphy.com/media/WS0MDT0DITCTLwcNNx/giphy.gif",
     ]
 
     closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
-    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️"]
+    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
 
     if QUIET and case_data[0] == 0:
         return
@@ -272,7 +282,7 @@ def create_graph(iterator):
     plot.figtext(
         0.5,
         0.01,
-        f"Generated on {now.strftime('%m/%d %H:%M')} EST",
+        f"Generated on {now.strftime('%m/%d/%y %H:%M')} EST",
         ha="center",
         fontsize=8,
     )
@@ -288,6 +298,7 @@ def main():
     current_case_data, date = check_for_updates()
 
     ci = any(x.lower() == "--ci" for x in sys.argv)
+    force = any(x.lower() == "--force" for x in sys.argv)
 
     # Only post under the following conditions:
     # 1. There is new data from RPI
@@ -295,7 +306,8 @@ def main():
     # 2. there are new positive tests OR new weekly/total numbers reported
     # This avoids the bs updates where all RPI does is reset the daily/weekly numbers
     if (
-        current_case_data != previous_case_data
+        force
+        or current_case_data != previous_case_data
         and (
             current_case_data[0] != 0
             or any(
