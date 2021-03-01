@@ -3,3 +3,4 @@ bs4
 lxml
 savepagenow
 requests
+html2text
