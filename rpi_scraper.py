@@ -5,6 +5,7 @@ import html2text
 import requests
 
 
+MAX_MESSAGE_LEN = 2000
 HOME_URL = 'https://covid19.rpi.edu'
 
 
@@ -72,14 +73,42 @@ def get_post_author_date_and_content(bs_tags):
 
 
 def collect_beautifulsoup_tags(path):
-    beautifulsoup_tags = {}
+    bs_tags = {}
     div_attributes = {'author': {'class': 'field--name-field-from'},
                       'content': {'property': 'schema:text'},
                       'date': {'class': 'node__meta'}}
     soup = create_soup(path)
     for post_property, attrs in div_attributes.items():
-        beautifulsoup_tags[post_property] = soup.find('div', attrs=attrs)
-    return beautifulsoup_tags
+        bs_tags[post_property] = soup.find('div', attrs=attrs)
+    return bs_tags
+
+
+def trim_message_len(message, link):
+    if len(message) > MAX_MESSAGE_LEN:
+        suffix = f'...\n\n\t(...)\n\nto read full post, go to {link}!'
+        message = message[:MAX_MESSAGE_LEN - len(suffix)]
+        message += suffix
+    return message
+
+
+def parse_header(announcement_data, link):
+    author = announcement_data.get('author', '')
+    date = announcement_data.get('date', '')
+
+    intro =   '* * *  New covid19.rpi.edu announcement! * * *\n\n'
+    link =   f'Full post available here: {link}\n'
+    author = f'From: {author}\n' if author else ''
+    date =   f'Date: {date}\n\n' if date else ''
+
+    return intro + link + author + date
+
+
+def parse_discord_message(announcement_data, path):
+    content = announcement_data.get('content', '')
+    link = construct_url(path)
+    header = parse_header(announcement_data, link)
+    msg = header + content
+    return trim_message_len(msg, link)
 
 
 if __name__ == '__main__':
@@ -90,5 +119,7 @@ if __name__ == '__main__':
     for path in new_paths:
         bs_tags = collect_beautifulsoup_tags(path)
         announcement_data = get_post_author_date_and_content(bs_tags)
+        msg = parse_discord_message(announcement_data, path)
+        print(msg)
 
     # update_cache(new_paths)
