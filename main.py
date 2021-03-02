@@ -258,7 +258,7 @@ def save(case_data):
         pickle.dump(case_data, file)
 
 
-def create_graph(iterator):
+def create_graph(iterator, showDayNums=False):
     x = [int(z) for z in iterator]
     cum = [x[0]]
     for i in range(1, len(x)):
@@ -274,6 +274,12 @@ def create_graph(iterator):
         plot.plot(dates, [30] * 14, "g--", label="trigger level 1")
     plot.xticks(dates, dates, rotation=45)
     plot.legend()
+    # Add individual day labels
+    if showDayNums:
+        for i, v in enumerate(x):
+            if v == 0:
+                continue
+            plot.text(i, v, str(v), color="blue", fontweight="bold")
     data = BytesIO()
     plot.subplots_adjust(bottom=0.17)
     plot.ylabel("Number of positive tests")
