@@ -288,7 +288,7 @@ def create_graph(iterator, showDayNums=False):
     plot.figtext(
         0.5,
         0.01,
-        f"Generated on {now.strftime('%m/%d/%y %H:%M')} EST",
+        f"Generated on {now.strftime('%m/%d/%y %H:%M')} {datetime.now().astimezone().tzinfo.tzname(None)}",
         ha="center",
         fontsize=8,
     )
