@@ -279,7 +279,7 @@ def create_graph(iterator, showDayNums=False):
         for i, v in enumerate(x):
             if v == 0:
                 continue
-            plot.text(i, v, str(v), color="blue", fontweight="bold")
+            plot.text(i, v, str(v), color="blue", fontweight="bold", ha="center")
     data = BytesIO()
     plot.subplots_adjust(bottom=0.17)
     plot.ylabel("Number of positive tests")
