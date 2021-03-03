@@ -258,7 +258,7 @@ def save(case_data):
         pickle.dump(case_data, file)
 
 
-def create_graph(iterator, showDayNums=False):
+def create_graph(iterator, showDayNums=True):
     x = [int(z) for z in iterator]
     cum = [x[0]]
     for i in range(1, len(x)):
