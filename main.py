@@ -166,15 +166,12 @@ def post_discord(
 
     embed = DiscordEmbed()
 
-    if rolling <= 30:
-        if case_data[0] > 0:
-            embed.set_color(15158332)
-            embed.set_thumbnail(url=choice(positive_thumbnails))
-        else:
-            embed.set_color(3066993)
-            embed.set_thumbnail(url=choice(negative_thumbnails))
+    if case_data[0] > 0:
+        embed.set_color(15158332)
+        embed.set_thumbnail(url=choice(positive_thumbnails))
     else:
-        embed.set_thumbnail(url=closed_thumbnail)
+        embed.set_color(3066993)
+        embed.set_thumbnail(url=choice(negative_thumbnails))
 
     if PSA is not None:
         embed.add_embed_field(name="ANNOUNCEMENT", value=PSA, inline=False)
@@ -269,9 +266,7 @@ def create_graph(iterator, showDayNums=True):
     dates = [monthday(today - timedelta(days=x)) for x in range(13, -1, -1)]
     plot.title(f"Previous 14 days")
     plot.bar(dates, x, color="red", label="daily positive tests")
-    plot.plot(dates, cum, color="orange", label="cumulative total")
-    if cum[-1] > 15:
-        plot.plot(dates, [30] * 14, "g--", label="trigger level 1")
+    plot.plot(dates, cum, color="orange", label="2 week total")
     plot.xticks(dates, dates, rotation=45)
     plot.legend()
     # Add individual day labels
