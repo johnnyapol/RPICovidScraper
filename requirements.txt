@@ -4,3 +4,4 @@ lxml
 savepagenow
 requests
 matplotlib
+html2text
