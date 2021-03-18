@@ -46,50 +46,29 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 class CovidData:
     def __init__(self):
         self.rpi_array = [0] * 5
-        self.rolling_array = [0] * 14
         self.last_updated = date.today()
-        self.array_index = 0
         self.historicalData = {}
-
-    def increment_index(self):
-        self.array_index = (self.array_index + 1) % 14
 
     def update(self, case_data):
         today = date.today()
+
         if today != self.last_updated:
-            assert today > self.last_updated
-            delta = (today - self.last_updated).days - 1
-            self.increment_index()
-
-            # Fill in 0s
-            while delta != 0:
-                self.rolling_array[self.array_index] = 0
-                self.increment_index()
-                delta -= 1
-
-        # Write out next data
-        self.rolling_array[self.array_index] = case_data[0]
+            self.last_updated = today
+            self.historicalData[today] = case_data
         self.rpi_array = case_data
-        self.last_updated = today
-
-        # Backwards compatability
-        try:
-            self.historicalData[today] = case_data
-        except AttributeError:
-            self.historicalData = {}
-            self.historicalData[today] = case_data
 
     def get_rolling(self):
-        return sum(self.rolling_array)
+        return sum(self.get_rolling_iterator(self.last_updated))
 
     def get_case_data(self):
         return self.rpi_array
 
-    def get_rolling_iterator(self):
-        return chain(
-            self.rolling_array[self.array_index + 1 : 14],
-            self.rolling_array[: self.array_index + 1],
-        )
+    def get_rolling_iterator(self, day=date.today()):
+        dates = [day - timedelta(days=x) for x in range(13, -1, -1)]
+        return [
+            self.historicalData[date][0] if date in self.historicalData else 0
+            for date in dates
+        ]
 
 
 def check_for_updates():
@@ -156,8 +135,6 @@ def post_discord(
         "https://media.giphy.com/media/KHEgvyrgYnL9RW08h6/giphy.gif",
         "https://media.giphy.com/media/WS0MDT0DITCTLwcNNx/giphy.gif",
     ]
-
-    closed_thumbnail = "https://www.insidehighered.com/sites/default/server_files/styles/large-copy/public/media/iStock-851180708_0.jpg?itok=8vdbtNt4"
 
     emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
 
@@ -255,26 +232,32 @@ def save(case_data):
         pickle.dump(case_data, file)
 
 
-def create_graph(iterator, showDayNums=True):
-    x = [int(z) for z in iterator]
+def create_graph(data):
+    x = [int(z) for z in data.get_rolling_iterator()]
     cum = [x[0]]
     for i in range(1, len(x)):
         cum.append(cum[-1] + x[i])
     # thanks to https://www.tutorialspoint.com/matplotlib/matplotlib_bar_plot.htm for help
     today = date.today()
     monthday = lambda d: f"{d.month}-{d.day}"
-    dates = [monthday(today - timedelta(days=x)) for x in range(13, -1, -1)]
+    dates = [today - timedelta(days=x) for x in range(13, -1, -1)]
     plot.title(f"Previous 14 days")
     plot.bar(dates, x, color="red", label="daily positive tests")
-    plot.plot(dates, cum, color="orange", label="2 week total")
-    plot.xticks(dates, dates, rotation=45)
-    plot.legend()
+    plot.plot(dates, cum, color="orange", label="Current 2 week sum")
     # Add individual day labels
-    if showDayNums:
-        for i, v in enumerate(x):
-            if v == 0:
-                continue
-            plot.text(i, v, str(v), color="blue", fontweight="bold", ha="center")
+    for i, v in zip(dates, x):
+        if v == 0:
+            continue
+        plot.text(i, v, str(v), color="blue", fontweight="bold", ha="center")
+    plot.plot(
+        dates,
+        [sum(data.get_rolling_iterator(date)) for date in dates],
+        color="green",
+        label="Rolling 2 week sum",
+    )
+    plot.xticks(dates, [monthday(date) for date in dates], rotation=45)
+    plot.legend()
+
     data = BytesIO()
     plot.subplots_adjust(bottom=0.17)
     plot.ylabel("Number of positive tests")
@@ -338,7 +321,7 @@ def main():
             previous_case_data,
             date,
             dashboard_url,
-            create_graph(covid_data.get_rolling_iterator()),
+            create_graph(covid_data),
         )
 
         save(covid_data)

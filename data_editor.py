@@ -19,6 +19,7 @@ def print_stats(data):
     print("Rolling array: ", data.rolling_array)
     print("Last updated: ", data.last_updated)
     print("Array index: ", data.array_index)
+    print("historical: ", data.historicalData)
 
 
 if __name__ == "__main__":
