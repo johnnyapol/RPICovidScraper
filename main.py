@@ -46,7 +46,7 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 class CovidData:
     def __init__(self):
         self.rpi_array = [0] * 5
-        self.last_updated = date.today() - timedelta(day=1)
+        self.last_updated = date.today() - timedelta(days=1)
         self.historicalData = {}
 
     def update(self, case_data):
