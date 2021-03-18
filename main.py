@@ -243,7 +243,7 @@ def create_graph(data):
     dates = [today - timedelta(days=x) for x in range(13, -1, -1)]
     plot.title(f"Previous 14 days")
     plot.bar(dates, x, color="red", label="daily positive tests")
-    plot.plot(dates, cum, color="orange", label="Current 2 week sum")
+    plot.plot(dates, cum, color="orange", label=f"Positives since {monthday(dates[0])}")
     # Add individual day labels
     for i, v in zip(dates, x):
         if v == 0:
