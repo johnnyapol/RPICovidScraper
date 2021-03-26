@@ -179,7 +179,7 @@ def post_discord(
     if case_data[1] != 0:
         # Calculate weekly positivity rate
         pcr = (case_data[1] / case_data[3]) * 100
-        embed.add_embed_field(name="Weekly Positivty Rate", value=f"{round(pcr, 4)}%")
+        embed.add_embed_field(name="Weekly Positivity Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
         name="Total Positive Tests",
         value=case_value_to_string(case_data, previous_case_data, 2),
