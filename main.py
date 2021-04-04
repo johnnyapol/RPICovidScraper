@@ -203,7 +203,7 @@ def post_discord(
         content=choice(
             [
                 "The RPI Covid Dashboard has been updated!",
-                "I got yer COVID cases right here!",
+                "I got yer COVID data right here!",
                 "Special delivery!",
                 "Beep beep boop",
                 "I found some data!",
