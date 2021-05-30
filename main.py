@@ -45,30 +45,31 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 
 class CovidData:
     def __init__(self):
-        self.rpi_array = [0] * 5
-        self.last_updated = date.today() - timedelta(days=1)
-        self.historicalData = {}
+        self.rpi_array = [0] * 3
+        self.last_updated = ""
+        self.total_cases = 0
+        self.historicalData = []
 
-    def update(self, case_data):
-        today = date.today()
-
+    def update(self, case_data, today):
         if today != self.last_updated:
             self.last_updated = today
-            self.historicalData[today] = case_data
+            self.historicalData.append(case_data)
+            self.total_cases += case_data[0]
         self.rpi_array = case_data
 
     def get_rolling(self):
-        return sum(self.get_rolling_iterator(self.last_updated))
+        # Grab last two weeks worth of data
+        return sum(x[0] for x in self.historicalData[-2:])
 
     def get_case_data(self):
         return self.rpi_array
 
-    def get_rolling_iterator(self, day=date.today()):
-        dates = [day - timedelta(days=x) for x in range(13, -1, -1)]
-        return [
-            self.historicalData[date][0] if date in self.historicalData else 0
-            for date in dates
-        ]
+    def get_rolling_iterator(self):
+        # Show past month's worth of data
+        return self.historicalData[-4:]
+
+    def get_total_cases(self):
+        return self.total_cases
 
 
 def check_for_updates():
@@ -81,12 +82,9 @@ def check_for_updates():
 
     """
         Current data format:
-
-        case_data[0] = positive tests (last 24 hours)
-        case_data[1] = positive test results (last 7 days)
-        case_data[2] = positive test results (since august 17th)
-        case_data[3] = total tests (last 7 days)
-        case_data[4] = total tests (since august 17th)
+        case_data[0] = positive test results (last 7 days)
+        case_data[1] = total tests (last 7 days)
+        case_data[2] = total tests (since start of sem)
     """
     return (
         [
@@ -112,9 +110,7 @@ def get_git_hash():
         return ""
 
 
-def post_discord(
-    rolling, old_rolling, case_data, previous_case_data, date, dashboard_url, graph
-):
+def post_discord(new, old, date, dashboard_url, graph):
     global WEBHOOKS
     global PSA
     global QUIET
@@ -138,6 +134,9 @@ def post_discord(
 
     emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
 
+    case_data = new.get_case_data()
+    previous_case_data = old.get_case_data()
+
     if QUIET and case_data[0] == 0:
         return
 
@@ -155,38 +154,33 @@ def post_discord(
         embed.color = 15844367
 
     embed.add_embed_field(
-        name="New Positive Tests",
-        value=f"{case_data[0]}",
-        inline=False,
-    )
-    embed.add_embed_field(
         name="Positive Tests (7 days)",
-        value=case_value_to_string(case_data, previous_case_data, 1),
+        value=case_value_to_string(case_data, previous_case_data, 0),
         inline=False,
     )
 
     embed.add_embed_field(
         name="Positive Tests (14 days)",
-        value=case_value_to_string([rolling], [old_rolling], 0),
+        value=case_value_to_string([new.get_rolling()], [old.get_rolling()], 0),
         inline=False,
     )
 
     embed.add_embed_field(
         name="Weekly Test Count",
-        value=case_value_to_string(case_data, previous_case_data, 3),
+        value=case_value_to_string(case_data, previous_case_data, 1),
         inline=False,
     )
-    if case_data[1] != 0:
+    if case_data[0] != 0:
         # Calculate weekly positivity rate
-        pcr = (case_data[1] / case_data[3]) * 100
+        pcr = (case_data[0] / case_data[1]) * 100
         embed.add_embed_field(name="Weekly Positivity Rate", value=f"{round(pcr, 4)}%")
     embed.add_embed_field(
         name="Total Positive Tests",
-        value=case_value_to_string(case_data, previous_case_data, 2),
+        value=case_value_to_string([new.get_total_cases()], [new.get_total_cases()], 0),
     )
     embed.add_embed_field(
         name="Total Tests",
-        value=case_value_to_string(case_data, previous_case_data, 4),
+        value=case_value_to_string(case_data, previous_case_data, 2),
     )
     embed.set_author(
         name="Click for dashboard",
@@ -212,15 +206,17 @@ def post_discord(
         username="RPI Covid Dashboard",
         avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
     )
-    hook.add_file(file=graph.read(), filename="graph.png")
-    embed.set_image(url="attachment://graph.png")
+
+    if graph != None:
+        hook.add_file(file=graph.read(), filename="graph.png")
+        embed.set_image(url="attachment://graph.png")
     hook.add_embed(embed)
     hook.execute()
 
 
 def load_previous():
     try:
-        with open(".cache", "rb") as file:
+        with open(".cache_v2", "rb") as file:
             return pickle.load(file)
     except:
         print("Cache read failed")
@@ -228,11 +224,12 @@ def load_previous():
 
 
 def save(case_data):
-    with open(".cache", "wb") as file:
+    with open(".cache_v2", "wb") as file:
         pickle.dump(case_data, file)
 
 
 def create_graph(data):
+    return None
     x = [int(z) for z in data.get_rolling_iterator()]
     cum = [x[0]]
     for i in range(1, len(x)):
@@ -311,14 +308,12 @@ def main():
             print(f"Page archived failed")
             traceback.print_exc()
 
-        old_rolling = covid_data.get_rolling()
-        covid_data.update(current_case_data)
+        previous_covid_data = deepcopy(covid_data)
+        covid_data.update(current_case_data, date)
 
         post_discord(
-            covid_data.get_rolling(),
-            old_rolling,
-            current_case_data,
-            previous_case_data,
+            covid_data,
+            previous_covid_data,
             date,
             dashboard_url,
             create_graph(covid_data),
