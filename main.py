@@ -212,8 +212,10 @@ def post_discord(
         username="RPI Covid Dashboard",
         avatar_url="https://www.minnpost.com/wp-content/uploads/2020/03/coronavirusCDC640.png",
     )
-    hook.add_file(file=graph.read(), filename="graph.png")
-    embed.set_image(url="attachment://graph.png")
+
+    if graph != None:
+        hook.add_file(file=graph.read(), filename="graph.png")
+        embed.set_image(url="attachment://graph.png")
     hook.add_embed(embed)
     hook.execute()
 
@@ -321,7 +323,7 @@ def main():
             previous_case_data,
             date,
             dashboard_url,
-            create_graph(covid_data),
+            None,
         )
 
         save(covid_data)
