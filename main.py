@@ -105,11 +105,12 @@ def case_value_to_string(case_data, previous_case_data, index):
     return f"{case_data[index]:,} {diff_string}"
 
 
-def get_git_hash():
+def get_source_url():
+    start = "https://github.com/johnnyapol/RPICovidScraper/"
     try:
-        return f'({run(["git", "log", "--pretty=format:%h", "-n", "1"], capture_output=True).stdout.decode("ascii")})'
+        return f'{start}commit/{run(["git", "log", "--pretty=format:%H", "-n", "1"], capture_output=True).stdout.decode("ascii")}'
     except:
-        return ""
+        return start
 
 
 def post_discord(
@@ -184,18 +185,18 @@ def post_discord(
         name="Total Positive Tests",
         value=case_value_to_string(case_data, previous_case_data, 2),
     )
+
+    # Since discord footers don't support "rich" content, hack on a footer to the last field
+    date = "".join(date.split("\n"))
     embed.add_embed_field(
         name="Total Tests",
-        value=case_value_to_string(case_data, previous_case_data, 4),
+        value=f"{case_value_to_string(case_data, previous_case_data, 4)}\n{date} Made with {choice(emojis)} - [source]({get_source_url()})",
+        inline=False,
     )
     embed.set_author(
         name="Click for dashboard",
         url=dashboard_url,
         icon_url="https://i.redd.it/14nqzc0hswy31.png",
-    )
-
-    embed.set_footer(
-        text=f"{date}\nMade with {choice(emojis)} - https://github.com/johnnyapol/RPICovidScraper {get_git_hash()}"
     )
 
     hook = DiscordWebhook(
