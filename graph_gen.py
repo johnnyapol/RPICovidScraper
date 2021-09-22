@@ -13,7 +13,7 @@ if __name__ == "__main__":
     data = load_previous()
     print("Got data: ", data)
 
-    data = create_graph(data.get_rolling_iterator(), showDayNums=True)
+    data = create_graph(data)
     with open("graph.png", "wb") as f:
         f.write(data.read())
 

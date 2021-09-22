@@ -73,7 +73,12 @@ class CovidData:
 
 def check_for_updates():
     global DASHBOARD
-    request = requests.get(DASHBOARD)
+    request = requests.get(
+        DASHBOARD,
+        headers={
+            "User-Agent": "RPICovidScraper https://github.com/johnnyapol/RPICovidScraper"
+        },
+    )
     soup = BeautifulSoup(request.text, features="lxml")
     header = "field field--name-field-stats field--type-entity-reference-revisions field--label-hidden field__items"
     header2 = "field field--name-field-stat field--type-string field--label-hidden field__item"
@@ -324,7 +329,7 @@ def main():
             previous_case_data,
             date,
             dashboard_url,
-            None,
+            create_graph(covid_data),
         )
 
         save(covid_data)
