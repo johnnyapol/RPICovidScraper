@@ -131,19 +131,19 @@ def post_discord(
         "https://www.continentalmessage.com/wp-content/uploads/2015/09/123rf-alert2.jpg",
         "https://i.kym-cdn.com/photos/images/newsfeed/000/675/645/2c7.gif",
         "https://media.discordapp.net/attachments/783375197604413445/790625854202839100/image0.png",
-        "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif"
+        "https://media.tenor.com/images/6603c0a47ff16ad8d3682e481e727f76/tenor.gif",
     ]
 
     neutral_thumbnails = [
         "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/5671259/7923c9b8e0a5799d4d422208b31f5ca0f4f49067.png",
         "https://static01.nyt.com/images/2020/01/28/science/28VIRUS-BATS1/28VIRUS-BATS1-videoSixteenByNineJumbo1600.jpg",
         "https://ih1.redbubble.net/image.1877589148.0162/ur,mask_flatlay_front,wide_portrait,750x1000.jpg",
-        "https://media.giphy.com/media/KHEgvyrgYnL9RW08h6/giphy.gif"
+        "https://media.giphy.com/media/KHEgvyrgYnL9RW08h6/giphy.gif",
     ]
 
     negative_thumbnails = [
         "https://media.giphy.com/media/WS0MDT0DITCTLwcNNx/giphy.gif",
-        "https://cdn.vox-cdn.com/thumbor/iuL4QWaANcy5lyeCDXxIrBq7_uQ=/0x0:3000x2000/1400x1050/filters:focal(1436x422:1916x902):no_upscale()/cdn.vox-cdn.com/uploads/chorus_image/image/68718659/AP_20331457642255.0.jpg"
+        "https://cdn.vox-cdn.com/thumbor/iuL4QWaANcy5lyeCDXxIrBq7_uQ=/0x0:3000x2000/1400x1050/filters:focal(1436x422:1916x902):no_upscale()/cdn.vox-cdn.com/uploads/chorus_image/image/68718659/AP_20331457642255.0.jpg",
     ]
 
     emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
@@ -168,9 +168,7 @@ def post_discord(
         embed.color = 15844367
 
     embed.add_embed_field(
-        name="New Positive Tests",
-        value=f"{case_data[0]}",
-        inline=False,
+        name="New Positive Tests", value=f"{case_data[0]}", inline=False,
     )
     embed.add_embed_field(
         name="Positive Tests (7 days)",
