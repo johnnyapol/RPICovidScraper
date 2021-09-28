@@ -168,7 +168,9 @@ def post_discord(
         embed.color = 15844367
 
     embed.add_embed_field(
-        name="New Positive Tests", value=f"{case_data[0]}", inline=False,
+        name="New Positive Tests",
+        value=f"{case_data[0]}",
+        inline=False,
     )
     embed.add_embed_field(
         name="Positive Tests (7 days)",
