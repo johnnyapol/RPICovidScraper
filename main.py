@@ -63,8 +63,8 @@ class CovidData:
     def get_case_data(self):
         return self.rpi_array
 
-    def get_rolling_iterator(self, day=date.today()):
-        dates = [day - timedelta(days=x) for x in range(13, -1, -1)]
+    def get_rolling_iterator(self, day=date.today(), days=13):
+        dates = [day - timedelta(days=x) for x in range(days, -1, -1)]
         return [
             self.historicalData[date][0] if date in self.historicalData else 0
             for date in dates
@@ -247,16 +247,16 @@ def save(case_data):
         pickle.dump(case_data, file)
 
 
-def create_graph(data):
-    x = [int(z) for z in data.get_rolling_iterator()]
+def create_graph(data, days=13):
+    x = [int(z) for z in data.get_rolling_iterator(days=days)]
     cum = [x[0]]
     for i in range(1, len(x)):
         cum.append(cum[-1] + x[i])
     # thanks to https://www.tutorialspoint.com/matplotlib/matplotlib_bar_plot.htm for help
     today = date.today()
     monthday = lambda d: f"{d.month}-{d.day}"
-    dates = [today - timedelta(days=x) for x in range(13, -1, -1)]
-    plot.title(f"Previous 14 days")
+    dates = [today - timedelta(days=x) for x in range(days, -1, -1)]
+    plot.title(f"Previous {days+1} days")
     plot.bar(dates, x, color="red", label="daily positive tests")
     plot.plot(dates, cum, color="orange", label=f"Positives since {monthday(dates[0])}")
     # Add individual day labels
