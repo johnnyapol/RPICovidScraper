@@ -258,7 +258,7 @@ def create_graph(data, days=13):
     monthday = lambda d: f"{d.month}-{d.day}"
     dates = [today - timedelta(days=x) for x in range(days, -1, -1)]
     plot.title(f"Previous {days+1} days")
-    plot.bar(dates, x, color="red", label="daily positive tests")
+    plot.bar(dates, x, color="red", label="Daily positive tests")
     plot.plot(dates, cum, color="orange", label=f"Positives since {monthday(dates[0])}")
     # Add individual day labels
     for i, v in zip(dates, x):
