@@ -91,7 +91,7 @@ def check_for_updates():
     """
     return (
         [
-            # Cleanup text (remove commas, all whitespace) so python can parse ita
+            # Cleanup text (remove commas, all whitespace) so python can parse it
             int("".join(x.text.replace(",", "").split()))
             for x in soup.find("div", {"class": header}).findAll(
                 "div", {"class": header2}
