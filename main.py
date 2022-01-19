@@ -46,19 +46,15 @@ DASHBOARD = "https://covid19.rpi.edu/dashboard"
 class CovidData:
     def __init__(self):
         self.rpi_array = [0] * 5
-        self.last_updated = date.today() - timedelta(days=1)
         self.historicalData = {}
 
     def update(self, case_data):
         today = date.today()
-
-        if today != self.last_updated:
-            self.last_updated = today
-            self.historicalData[today] = case_data
+        self.historicalData[today] = case_data
         self.rpi_array = case_data
 
     def get_rolling(self):
-        return sum(self.get_rolling_iterator(self.last_updated))
+        return sum(self.get_rolling_iterator())
 
     def get_case_data(self):
         return self.rpi_array
@@ -95,7 +91,7 @@ def check_for_updates():
     """
     return (
         [
-            # Cleanup text (remove commas, all whitespace) so python can parse it
+            # Cleanup text (remove commas, all whitespace) so python can parse ita
             int("".join(x.text.replace(",", "").split()))
             for x in soup.find("div", {"class": header}).findAll(
                 "div", {"class": header2}
