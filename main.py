@@ -66,6 +66,11 @@ class CovidData:
             for date in dates
         ]
 
+    def get_last_update(self):
+        return (
+            None if len(self.historicalData) == 0 else max(self.historicalData.keys())
+        )
+
 
 def check_for_updates():
     global DASHBOARD
@@ -323,7 +328,11 @@ def main():
             print(f"Page archived failed")
             traceback.print_exc()
 
-        old_rolling = covid_data.get_rolling()
+        last_update = covid_data.get_last_update()
+        if last_update is None:
+            old_rolling = 0
+        else:
+            old_rolling = sum(covid_data.get_rolling_iterator(day=last_update))
         covid_data.update(current_case_data)
 
         post_discord(
