@@ -101,22 +101,18 @@ def check_for_updates():
         case_data[2] = total tests (last 7 days)
         case_data[3] = total tests (semester)
     """
-    data = (
-        [
-            # Cleanup text (remove commas, all whitespace) so python can parse it
-            int("".join(x.text.replace(",", "").split()))
-            for x in soup.find("div", {"class": header}).findAll(
-                "div", {"class": header2}
-            )
-        ],
-        soup.find("div", {"class": date_header}).text,
-    )
+
+    data = [
+        # Cleanup text (remove commas, all whitespace) so python can parse it
+        int("".join(x.text.replace(",", "").split()))
+        for x in soup.find("div", {"class": header}).findAll("div", {"class": header2})
+    ]
+    caption = soup.find("div", {"class": date_header}).text
     # Weekly
     if len(data) == 4:
         # Quick hack to duplicate the weekly entry as the daily
         data.insert(0, data[0])
-
-    return data
+    return (data, caption)
 
 
 def case_value_to_string(case_data, previous_case_data, index):
