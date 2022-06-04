@@ -88,13 +88,20 @@ def check_for_updates():
     """
         Current data format:
 
+        Daily:
         case_data[0] = positive tests (last 24 hours)
         case_data[1] = positive test results (last 7 days)
-        case_data[2] = positive test results (since august 17th)
+        case_data[2] = positive test results (semester)
         case_data[3] = total tests (last 7 days)
-        case_data[4] = total tests (since august 17th)
+        case_data[4] = total tests (semester)
+
+        Weekly:
+        case_data[0] = positive test results (last 7 days)
+        case_data[1] = positive test results (semester)
+        case_data[2] = total tests (last 7 days)
+        case_data[3] = total tests (semester)
     """
-    return (
+    data = (
         [
             # Cleanup text (remove commas, all whitespace) so python can parse it
             int("".join(x.text.replace(",", "").split()))
@@ -104,6 +111,12 @@ def check_for_updates():
         ],
         soup.find("div", {"class": date_header}).text,
     )
+    # Weekly
+    if len(data) == 4:
+        # Quick hack to duplicate the weekly entry as the daily
+        data.insert(0, data[0])
+
+    return data
 
 
 def case_value_to_string(case_data, previous_case_data, index):
@@ -148,7 +161,7 @@ def post_discord(
         "https://cdn.vox-cdn.com/thumbor/iuL4QWaANcy5lyeCDXxIrBq7_uQ=/0x0:3000x2000/1400x1050/filters:focal(1436x422:1916x902):no_upscale()/cdn.vox-cdn.com/uploads/chorus_image/image/68718659/AP_20331457642255.0.jpg",
     ]
 
-    emojis = ["❤️", "✨", "🥓", "🍺", "🧻", "🐍", "☃️", "😷"]
+    emojis = ["❤️", "🍺", "🐱‍💻", "😷", "🏖️", "🦠", "🍉"]
 
     if QUIET and case_data[0] == 0:
         return
